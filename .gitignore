@@ -1,0 +1,10 @@
+/tokens/
+/src/main/resources/credentials.json
+/.gradle/
+/.idea/
+/.settings/
+/.vscode/
+/bin/
+/build/
+/.classpath
+/.project

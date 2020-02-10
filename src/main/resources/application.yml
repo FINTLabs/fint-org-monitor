@@ -1,0 +1,16 @@
+security:
+  basic:
+    enabled: false
+
+  oauth2:
+    client:
+      clientId:       47f5fa7b-54a6-4a55-9c6a-3afa0a8670f0
+      clientSecret:   EcA6J0l-3qSyOQoS7xPc9iOhUj2l9BGX6D2fY2QyY5NNeFl3_7skp8DiJlqOSkAV3ft-GK08D4I5IIQoGoYPWg
+      username:       asgeir@client.viken.no
+      password:       m0dpXcZsU1Ms65VIGeTaSLiH0GEygIdk
+      scope:          fint-client
+      accessTokenUri: https://idp.felleskomponent.no/nidp/oauth/nam/token
+
+fint:
+  orgmonitor:
+    endpoint: https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement

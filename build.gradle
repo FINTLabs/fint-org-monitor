@@ -1,0 +1,87 @@
+buildscript {
+    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/master/dependencies.gradle'
+    ext {
+        springBootVersion = springBootVersion
+    }
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+plugins {
+    id 'com.github.kt3k.coveralls' version '2.8.2'
+    id 'com.github.ben-manes.versions' version '0.21.0'
+}
+
+apply plugin: 'java'
+apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'maven'
+apply plugin: 'jacoco'
+
+version = "${version}-${apiVersion}"
+
+repositories {
+    mavenLocal()
+    jcenter()
+    maven {
+        url "http://dl.bintray.com/fint/maven"
+    }
+}
+
+dependencies {
+    compile('com.fasterxml.jackson.core:jackson-databind')
+    compile('com.google.api-client:google-api-client:1.23.0')
+    compile('com.google.apis:google-api-services-gmail:v1-rev83-1.23.0')
+    compile('com.google.oauth-client:google-oauth-client-jetty:1.23.0')
+    compile('org.jooq:jool-java-8:0.9.14')
+    compile('org.springframework.boot:spring-boot-starter')
+    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('com.sun.mail:javax.mail:1.6.2')
+
+    compile("org.projectlombok:lombok:${lombokVersion}")
+
+    compile('no.fint:fint-oauth-token-service:+')
+    compile("no.fint:fint-administrasjon-model-java:${apiVersion}")
+
+    testCompile("cglib:cglib-nodep:${cglibVersion}")
+    testCompile("org.spockframework:spock-spring:${spockSpringVersion}")
+    testCompile("org.spockframework:spock-core:${spockSpringVersion}")
+}
+
+task copyExternalDependencies(type: Copy) {
+    from configurations.compile
+    into "$buildDir/deps/external"
+    exclude '**/fint-*.jar'
+}
+
+task copyFintDependencies(type: Copy) {
+    from configurations.compile
+    into "$buildDir/deps/fint"
+    include '**/fint-*.jar'
+}
+
+build.dependsOn(copyExternalDependencies)
+build.dependsOn(copyFintDependencies)
+
+jar {
+    manifest {
+        attributes(
+                "Manifest-Version": "1.0",
+                "Main-Class": "no.fint.Application",
+                "Specification-Version": "${version}",
+                "Implementation-Version": "${version}",
+                "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
+        )
+    }
+}
+
+bootRepackage.enabled = false
+
+apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/master/dependencyReport.gradle'
