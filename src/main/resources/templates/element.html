@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<body>
+    <div th:fragment="org(item)">
+        <dl th:object="${item.data}">
+            <dt>Navn</dt>
+            <dd th:text="*{navn}">navn</dd>
+
+            <dt>Kortnavn</dt>
+            <dd th:text="*{kortnavn}">kortnavn</dd>
+
+            <dt>Kode</dt>
+            <dd th:text="*{organisasjonsKode.identifikatorverdi}">kode</dd>
+        </dl>
+    </div>
+</body>
+</html>

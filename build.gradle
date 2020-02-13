@@ -1,5 +1,5 @@
 buildscript {
-    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/master/dependencies.gradle'
+    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.8.0/dependencies.gradle'
     ext {
         springBootVersion = springBootVersion
     }
@@ -35,14 +35,17 @@ repositories {
 
 dependencies {
     compile('com.fasterxml.jackson.core:jackson-databind')
-    compile('com.google.api-client:google-api-client:1.23.0')
-    compile('com.google.apis:google-api-services-gmail:v1-rev83-1.23.0')
-    compile('com.google.oauth-client:google-oauth-client-jetty:1.23.0')
+    compile('com.google.api-client:google-api-client:1.30.5')
+    compile('com.google.apis:google-api-services-gmail:v1-rev20200110-1.30.8')
+    //compile('com.google.oauth-client:google-oauth-client-servlet:1.30.5')
+    compile 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
+
     compile('org.jooq:jool-java-8:0.9.14')
     compile('org.springframework.boot:spring-boot-starter')
     compile('org.springframework.boot:spring-boot-starter-data-mongodb')
     compile('org.springframework.boot:spring-boot-starter-hateoas')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
     compile('com.sun.mail:javax.mail:1.6.2')
 
     compile("org.projectlombok:lombok:${lombokVersion}")
@@ -53,6 +56,7 @@ dependencies {
     testCompile("cglib:cglib-nodep:${cglibVersion}")
     testCompile("org.spockframework:spock-spring:${spockSpringVersion}")
     testCompile("org.spockframework:spock-core:${spockSpringVersion}")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 task copyExternalDependencies(type: Copy) {
@@ -84,4 +88,4 @@ jar {
 
 bootRepackage.enabled = false
 
-apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/master/dependencyReport.gradle'
+apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.8.0/dependencyReport.gradle'

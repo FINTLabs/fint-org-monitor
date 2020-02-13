@@ -37,7 +37,13 @@ public class OrganisationService {
     @Autowired
     private OrganisationRepository repository;
 
-    @Scheduled(initialDelay = 10000L, fixedDelay = 40000L)
+    @Autowired
+    private TemplateService templateService;
+
+    @Autowired
+    private MailingService mailingService;
+
+    @Scheduled(initialDelay = 10000L, fixedDelayString = "${fint.orgmonitor.interval}")
     public void update() {
         List<OrganisationDocument> added = new ArrayList<>();
         List<Tuple2<OrganisationDocument, OrganisationDocument>> updated = new ArrayList<>();
@@ -77,6 +83,11 @@ public class OrganisationService {
         log.info("Added: {} items", added.size());
 
         log.info("Updated: {} items", updated.size());
+
+        if (!added.isEmpty() || !updated.isEmpty()) {
+            String result = templateService.render(added, updated);
+            mailingService.send(result);
+        }
     }
 
     private OrganisationDocument createDocument(Resource<Organisasjonselement> resource) {

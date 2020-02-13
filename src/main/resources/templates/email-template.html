@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="no" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Organisasjonsendringer</title>
+</head>
+<body>
+<p>Følgende organisasjonselementer er nye:</p>
+<ol>
+    <li th:each="item: ${added}">
+        <div th:include="element::org(${item})">...</div>
+    </li>
+</ol>
+<p>Følgende organisasjonselementer er endret:</p>
+<ol>
+    <li th:each="item: ${updated}">
+        <table>
+            <thead>
+            <tr>
+                <td>Før</td>
+                <td>Etter</td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>
+                    <div th:include="element::org(${item.v1})">...</div>
+                </td>
+                <td>
+                    <div th:include="element::org(${item.v2})">...</div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </li>
+</ol>
+</body>
+</html>
