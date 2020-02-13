@@ -1,5 +1,3 @@
-/tokens/
-/src/main/resources/credentials.json
 /.gradle/
 /.idea/
 /.settings/
@@ -9,3 +7,4 @@
 /.classpath
 /.project
 /out/
+/serviceaccount.json
