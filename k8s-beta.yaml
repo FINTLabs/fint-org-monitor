@@ -31,7 +31,6 @@ spec:
           env:
             - {name: fint.orgmonitor.endpoint, value: 'https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'}
             - {name: fint.orgmonitor.serviceaccount, value: '/credentials/serviceaccount.json'}
-            - {name: fint.orgmonitor.gmail.scopes, value: 'https://www.googleapis.com/auth/gmail.compose'}
             - {name: fint.orgmonitor.gmail.delegate, value: 'asgeir@fintlabs.no'}
             - {name: fint.orgmonitor.application-name, value: 'FINT Organization Monitor for Viken Fylkeskommune'}
             - {name: fint.orgmonitor.orgid, value: 'viken.no'}
