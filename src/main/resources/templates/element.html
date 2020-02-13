@@ -5,17 +5,19 @@
     <title>Title</title>
 </head>
 <body>
-    <div th:fragment="org(item)">
-        <dl th:object="${item.data}">
-            <dt>Navn</dt>
-            <dd th:text="*{navn}">navn</dd>
-
-            <dt>Kortnavn</dt>
-            <dd th:text="*{kortnavn}">kortnavn</dd>
-
-            <dt>Kode</dt>
-            <dd th:text="*{organisasjonsKode.identifikatorverdi}">kode</dd>
-        </dl>
-    </div>
+<div th:fragment="org(item)">
+    <table th:object="${item.data}">
+        <tr>
+            <th>Navn</th>
+            <th>Kortnavn</th>
+            <th>Kode</th>
+        </tr>
+        <tr>
+            <td th:text="*{kortnavn}">kortnavn</td>
+            <td th:text="*{navn}">navn</td>
+            <td th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>

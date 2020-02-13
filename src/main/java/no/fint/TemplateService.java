@@ -19,8 +19,6 @@ public class TemplateService {
         IContext context = new Context();
         context.getVariables().put("added", added);
         context.getVariables().put("updated", updated);
-        String result = templateEngine.process("email-template", context);
-        System.out.println(result);
-        return result;
+        return templateEngine.process("email-template", context);
     }
 }

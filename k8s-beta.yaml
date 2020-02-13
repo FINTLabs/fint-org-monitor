@@ -19,7 +19,7 @@ spec:
             secretName: google-service-account-gmail
       containers:
         - name: viken-no
-          image: fintlabs.azurecr.io/org-monitor:build.10
+          image: fintlabs.azurecr.io/org-monitor:build.2
           volumeMounts:
             - mountPath: /credentials
               name: credentials
@@ -38,5 +38,5 @@ spec:
             - {name: fint.orgmonitor.recipients, value: 'asgeir@fintlabs.no'}
             - {name: fint.orgmonitor.sender, value: 'asgeir@fintlabs.no'}
             - {name: fint.orgmonitor.interval, value: '3600000'}
-            - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-audit}}}
+            - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-mongo}}}
             - {name: spring.data.mongodb.database, value: 'org-monitor'}

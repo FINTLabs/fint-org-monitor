@@ -5,34 +5,38 @@
     <title>Organisasjonsendringer</title>
 </head>
 <body>
-<p>Følgende organisasjonselementer er nye:</p>
-<ol>
-    <li th:each="item: ${added}">
-        <div th:include="element::org(${item})">...</div>
-    </li>
-</ol>
-<p>Følgende organisasjonselementer er endret:</p>
-<ol>
-    <li th:each="item: ${updated}">
-        <table>
-            <thead>
-            <tr>
-                <td>Før</td>
-                <td>Etter</td>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>
-                    <div th:include="element::org(${item.v1})">...</div>
-                </td>
-                <td>
-                    <div th:include="element::org(${item.v2})">...</div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </li>
-</ol>
+<div th:unless="${#lists.isEmpty(added)}">
+    <h2>Følgende organisasjonselementer er nye:</h2>
+    <ol>
+        <li th:each="item: ${added}">
+            <div th:include="element::org(${item})">...</div>
+        </li>
+    </ol>
+</div>
+<div th:unless="${#lists.isEmpty(updated)}">
+    <h2>Følgende organisasjonselementer er endret:</h2>
+    <ol>
+        <li th:each="item: ${updated}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Før</th>
+                    <th>Etter</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <div style="background-color: #ffb7bd" th:include="element::org(${item.v1})">...</div>
+                    </td>
+                    <td>
+                        <div style="background-color: #dbffce" th:include="element::org(${item.v2})">...</div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </li>
+    </ol>
+</div>
 </body>
 </html>
