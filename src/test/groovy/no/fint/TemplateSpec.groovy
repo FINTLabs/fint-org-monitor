@@ -27,7 +27,8 @@ class TemplateSpec extends Specification{
                         data: new Organisasjonselement(
                                 navn: 'En liten test',
                                 kortnavn: 'test',
-                                organisasjonsKode: new Identifikator(identifikatorverdi: '123')
+                                organisasjonsKode: new Identifikator(identifikatorverdi: '123'),
+                                organisasjonsId: new Identifikator(identifikatorverdi: '2')
                         )
                 )
         ]
@@ -37,14 +38,16 @@ class TemplateSpec extends Specification{
                                 data: new Organisasjonselement(
                                         navn: 'Gammelt navn',
                                         kortnavn: 'gammel',
-                                        organisasjonsKode: new Identifikator(identifikatorverdi: '123')
+                                        organisasjonsKode: new Identifikator(identifikatorverdi: '123'),
+                                        organisasjonsId: new Identifikator(identifikatorverdi: '2')
                                 )
                         ),
                         new OrganisationDocument(
                                 data: new Organisasjonselement(
                                         navn: 'Nytt navn',
                                         kortnavn: 'ny',
-                                        organisasjonsKode: new Identifikator(identifikatorverdi: '123')
+                                        organisasjonsKode: new Identifikator(identifikatorverdi: '123'),
+                                        organisasjonsId: new Identifikator(identifikatorverdi: '2')
                                 )
                         )
                 )

@@ -11,11 +11,13 @@
             <th>Navn</th>
             <th>Kortnavn</th>
             <th>Kode</th>
+            <th>Id</th>
         </tr>
         <tr>
             <td th:text="*{kortnavn}">kortnavn</td>
             <td th:text="*{navn}">navn</td>
             <td th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
+            <td th:text="*{organisasjonsId.identifikatorverdi}">id</td>
         </tr>
     </table>
 </div>
