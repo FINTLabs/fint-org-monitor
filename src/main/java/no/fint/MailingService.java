@@ -14,6 +14,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,7 +35,7 @@ public class MailingService {
     public String send(String content) {
         try {
             log.info("Creating email from {} to {} ...", sender, recipients);
-            MimeMessage mimeMessage = createEmail(sender, recipients, "Org Monitor", content);
+            MimeMessage mimeMessage = createEmail(sender, recipients, String.format("Org Monitor %TF %<TR", new Date()), content);
             Message message = sendMessage("me", mimeMessage);
             return message.getId();
         } catch (MessagingException | IOException e) {
