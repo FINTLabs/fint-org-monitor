@@ -1,5 +1,6 @@
 package no.fint
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
 import org.jooq.lambda.tuple.Tuple2
@@ -73,5 +74,19 @@ class TemplateSpec extends Specification{
         then:
         !result.contains('er nye:')
         !result.contains('er endret:')
+    }
+
+    def 'Renders example JSON'() {
+        given:
+        def json = new ObjectMapper()
+        def org = json.readValue(getClass().getResourceAsStream('/testorg.json'), OrganisationDocument)
+
+        when:
+        println(org)
+        def result = templateService.render([org], [])
+        println(result)
+
+        then:
+        result.contains('VGKALN')
     }
 }

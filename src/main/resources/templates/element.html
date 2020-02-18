@@ -20,6 +20,8 @@
             <td th:text="*{organisasjonsId.identifikatorverdi}">id</td>
         </tr>
     </table>
+    <p>Overordnet: <span th:text="${item.overordnetId()}">over</span></p>
+    <p>Underordnet: <span th:text="${#strings.listJoin(item.underordnetId(), ', ')}">under</span></p>
 </div>
 </body>
 </html>

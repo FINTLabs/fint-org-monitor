@@ -57,6 +57,7 @@ dependencies {
     testCompile("org.spockframework:spock-spring:${spockSpringVersion}")
     testCompile("org.spockframework:spock-core:${spockSpringVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile 'org.apache.commons:commons-lang3:3.9'
 }
 
 task copyExternalDependencies(type: Copy) {
