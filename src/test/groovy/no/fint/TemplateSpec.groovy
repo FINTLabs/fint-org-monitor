@@ -88,5 +88,6 @@ class TemplateSpec extends Specification{
 
         then:
         result.contains('VGKALN')
+        result.contains('974544520')
     }
 }

@@ -8,16 +8,18 @@
 <div th:fragment="org(item)">
     <table th:object="${item.data}">
         <tr>
-            <th>Navn</th>
             <th>Kortnavn</th>
+            <th>Navn</th>
             <th>Kode</th>
             <th>Id</th>
+            <th>Org.nummer</th>
         </tr>
         <tr>
             <td th:text="*{kortnavn}">kortnavn</td>
             <td th:text="*{navn}">navn</td>
             <td th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
             <td th:text="*{organisasjonsId.identifikatorverdi}">id</td>
+            <th th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</th>
         </tr>
     </table>
     <p>Overordnet: <span th:text="${item.overordnetId()}">over</span></p>
