@@ -19,7 +19,7 @@
             <td th:text="*{navn}">navn</td>
             <td th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
             <td th:text="*{organisasjonsId.identifikatorverdi}">id</td>
-            <th th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</th>
+            <td th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</td>
         </tr>
     </table>
     <p>Overordnet: <span th:text="${item.overordnetId()}">over</span></p>
