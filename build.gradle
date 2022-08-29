@@ -1,92 +1,61 @@
-buildscript {
-    apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.8.0/dependencies.gradle'
-    ext {
-        springBootVersion = springBootVersion
-    }
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-    }
-}
-
 plugins {
-    id 'com.github.kt3k.coveralls' version '2.8.2'
-    id 'com.github.ben-manes.versions' version '0.21.0'
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'java'
+    id 'groovy'
 }
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'maven'
-apply plugin: 'jacoco'
-
+group = 'no.fintlabs'
 version = "${version}-${apiVersion}"
+sourceCompatibility = '17'
 
-repositories {
-    mavenLocal()
-    jcenter()
-    maven {
-        url "https://repo.fintlabs.no/releases"
+configurations {
+    implementationOnly {
+        extendsFrom annotationProcessor
     }
 }
-
-dependencies {
-    compile('com.fasterxml.jackson.core:jackson-databind')
-    compile('com.google.api-client:google-api-client:1.30.5')
-    compile('com.google.apis:google-api-services-gmail:v1-rev20200110-1.30.8')
-    //compile('com.google.oauth-client:google-oauth-client-servlet:1.30.5')
-    compile 'com.google.auth:google-auth-library-oauth2-http:0.20.0'
-
-    compile('org.jooq:jool-java-8:0.9.14')
-    compile('org.springframework.boot:spring-boot-starter')
-    compile('org.springframework.boot:spring-boot-starter-data-mongodb')
-    compile('org.springframework.boot:spring-boot-starter-hateoas')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
-    compile('com.sun.mail:javax.mail:1.6.2')
-
-    compile("org.projectlombok:lombok:${lombokVersion}")
-
-    compile('no.fint:fint-oauth-token-service:+')
-    compile("no.fint:fint-administrasjon-model-java:${apiVersion}")
-
-    testCompile("cglib:cglib-nodep:${cglibVersion}")
-    testCompile("org.spockframework:spock-spring:${spockSpringVersion}")
-    testCompile("org.spockframework:spock-core:${spockSpringVersion}")
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    compile 'org.apache.commons:commons-lang3:3.9'
-}
-
-task copyExternalDependencies(type: Copy) {
-    from configurations.compile
-    into "$buildDir/deps/external"
-    exclude '**/fint-*.jar'
-}
-
-task copyFintDependencies(type: Copy) {
-    from configurations.compile
-    into "$buildDir/deps/fint"
-    include '**/fint-*.jar'
-}
-
-build.dependsOn(copyExternalDependencies)
-build.dependsOn(copyFintDependencies)
 
 jar {
-    manifest {
-        attributes(
-                "Manifest-Version": "1.0",
-                "Main-Class": "no.fint.Application",
-                "Specification-Version": "${version}",
-                "Implementation-Version": "${version}",
-                "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
-        )
-    }
+    enabled = false
 }
 
-bootRepackage.enabled = false
+repositories {
+    mavenCentral()
+    repositories {
+        maven {
+            url "https://repo.fintlabs.no/releases"
+        }
+    }
+    mavenLocal()
+}
 
-apply from: 'https://raw.githubusercontent.com/FINTlibs/fint-buildscripts/v1.8.0/dependencyReport.gradle'
+
+dependencies {
+    implementation('com.fasterxml.jackson.core:jackson-databind')
+
+    implementation('org.jooq:jool-java-8:0.9.14')
+    implementation('org.springframework.boot:spring-boot-starter')
+    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation('org.springframework.boot:spring-boot-starter-hateoas')
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
+    implementation('com.sun.mail:javax.mail:1.6.2')
+
+    implementation('no.fint:fint-oauth-token-service:+')
+    implementation("no.fint:fint-administrasjon-model-java:${apiVersion}")
+    implementation 'org.apache.commons:commons-lang3:3.9'
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation("cglib:cglib-nodep:3.3.0")
+    testImplementation("org.spockframework:spock-spring:2.0-groovy-3.0")
+    testImplementation("org.spockframework:spock-core:2.0-groovy-3.0")
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+}
+
+test {
+    useJUnitPlatform()
+}
