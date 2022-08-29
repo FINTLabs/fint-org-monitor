@@ -1,0 +1,18 @@
+fint:
+  oauth:
+    access-token-uri: ''
+    client-id: ''
+    client-secret: ''
+    enabled: true
+    password: ''
+    scope: ''
+    username: ''
+
+  orgmonitor:
+    recipients: ''
+    sender: ''
+    endpoint: 'https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'
+    orgid: 'fintlabs.no'
+    interval: 300000
+    smtpUsername: ''
+    smtpPassword: ''
