@@ -15,7 +15,6 @@ import java.nio.file.Paths
 
 @SpringBootTest
 @ActiveProfiles('test')
-@Requires({ Files.exists(Paths.get('serviceaccount.json')) })
 class TemplateSpec extends Specification{
 
     @Autowired

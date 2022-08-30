@@ -56,17 +56,17 @@ public class OrganisationService {
         }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
-        for (EntityModel<Organisasjonselement> EntityModel : updates.getContent()) {
-            String id = EntityModel.getContent().getOrganisasjonsId().getIdentifikatorverdi();
+        for (EntityModel<Organisasjonselement> entityModel : updates.getContent()) {
+            String id = entityModel.getContent().getOrganisasjonsId().getIdentifikatorverdi();
 
             OrganisationDocument current = organisationMap.get(id);
 
             if (current == null) {
-                OrganisationDocument document = createDocument(EntityModel);
+                OrganisationDocument document = createDocument(entityModel);
                 updatedDocuments.add(document);
                 added.add(document);
             } else {
-                OrganisationDocument modified = createDocument(EntityModel);
+                OrganisationDocument modified = createDocument(entityModel);
                 if (!modified.equals(current)) {
                     modified.setId(current.getId());
                     updatedDocuments.add(modified);
@@ -88,13 +88,13 @@ public class OrganisationService {
         }
     }
 
-    private OrganisationDocument createDocument(EntityModel<Organisasjonselement> EntityModel) {
+    private OrganisationDocument createDocument(EntityModel<Organisasjonselement> entityModel) {
         OrganisationDocument document = new OrganisationDocument();
         document.setOrgId(config.getOrgid());
-        document.setData(EntityModel.getContent());
-        Optional<Link> overordnet = EntityModel.getLink("overordnet");
+        document.setData(entityModel.getContent());
+        Optional<Link> overordnet = entityModel.getLink("overordnet");
         overordnet.ifPresent(link -> document.setOverordnet(link.getHref()));
-        document.setUnderordnet(EntityModel.getLinks().stream().filter(it -> it.getRel().value().equals("underordnet")).map(Link::getHref).collect(Collectors.toList()));
+        document.setUnderordnet(entityModel.getLinks().stream().filter(it -> it.getRel().value().equals("underordnet")).map(Link::getHref).collect(Collectors.toList()));
         return document;
     }
 }
