@@ -1,3 +1,10 @@
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: org-monitor-viken
+spec:
+  itemPath: "vaults/aks-beta-vault/items/org-monitor-viken"
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -20,7 +27,7 @@ spec:
             - configMapRef:
                 name: fint-environment
             - secretRef:
-                name: client-asgeir-viken
+                name: org-monitor-viken
           env:
             - {name: fint.orgmonitor.endpoint, value: 'https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'}
             - {name: fint.orgmonitor.application-name, value: 'FINT Organization Monitor for Viken Fylkeskommune'}
