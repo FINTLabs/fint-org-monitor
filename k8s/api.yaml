@@ -32,8 +32,8 @@ spec:
             - {name: fint.orgmonitor.endpoint, value: 'https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'}
             - {name: fint.orgmonitor.application-name, value: 'FINT Organization Monitor for Viken Fylkeskommune'}
             - {name: fint.orgmonitor.orgid, value: 'viken.no'}
-            - {name: fint.orgmonitor.recipients, value: 'asgeir@fintlabs.no'}
-            - {name: fint.orgmonitor.sender, value: 'asgeir@fintlabs.no'}
+            - {name: fint.orgmonitor.recipients, value: 'henrik@fintlabs.no'}
+            - {name: fint.orgmonitor.sender, value: 'henknut@outlook.com'}
             - {name: fint.orgmonitor.interval, value: '3600000'}
             - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-mongo}}}
-            - {name: spring.data.mongodb.database, value: 'org-monitor'}
+            - {name: spring.data.mongodb.database, value: 'org-monitor-api'}
