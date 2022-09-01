@@ -16,3 +16,5 @@ fint:
     interval: 300000
     smtpUsername: ''
     smtpPassword: ''
+    smtpHost: '587'
+    smtpPort: 'outlook.office365.com'

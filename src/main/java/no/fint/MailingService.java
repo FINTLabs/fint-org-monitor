@@ -1,8 +1,6 @@
 package no.fint;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -51,8 +49,8 @@ public class MailingService {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", "outlook.office365.com");
-        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.host", config.getSmtpHost());
+        props.put("mail.smtp.port", config.getSmtpPort());
 
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {

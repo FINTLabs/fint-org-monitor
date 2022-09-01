@@ -24,6 +24,10 @@ public class Config {
 
     private String smtpPassword;
 
+    private String smtpHost;
+
+    private String smtpPort;
+
     private String sender;
 
     private List<String> recipients;
