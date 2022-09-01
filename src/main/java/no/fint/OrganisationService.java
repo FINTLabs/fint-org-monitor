@@ -52,7 +52,7 @@ public class OrganisationService {
 
         Map<String, OrganisationDocument> organisationMap = documents.stream().collect(Collectors.toMap(r -> r.getData().getOrganisasjonsId().getIdentifikatorverdi(), Function.identity()));
 
-        CollectionModel<EntityModel<Organisasjonselement>> updates = restUtil.getUpdates(new ParameterizedTypeReference<CollectionModel<EntityModel<Organisasjonselement>>>() {
+        CollectionModel<EntityModel<Organisasjonselement>> updates = restUtil.getUpdates(new ParameterizedTypeReference<>() {
         }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
