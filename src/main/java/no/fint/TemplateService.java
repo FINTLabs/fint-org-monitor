@@ -16,9 +16,9 @@ public class TemplateService {
     private TemplateEngine templateEngine;
 
     public String render(List<OrganisationDocument> added, List<Tuple2<OrganisationDocument, OrganisationDocument>> updated) {
-        IContext context = new Context();
-        context.getVariables().put("added", added);
-        context.getVariables().put("updated", updated);
+        Context context = new Context();
+        context.setVariable("added", added);
+        context.setVariable("updated", updated);
         return templateEngine.process("email-template", context);
     }
 }

@@ -1,19 +1,14 @@
 package no.fint;
 
-import com.google.api.client.util.Base64;
-import com.google.api.services.gmail.Gmail;
-import com.google.api.services.gmail.model.Message;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -21,29 +16,28 @@ import java.util.Properties;
 @Service
 @Slf4j
 public class MailingService {
-    @Autowired
-    private Gmail gmail;
 
-    @Autowired
-    @Qualifier("recipients")
-    private List<String> recipients;
+    private final Config config;
 
-    @Autowired
-    @Qualifier("sender")
-    private String sender;
-
-    public String send(String content) {
-        try {
-            log.info("Creating email from {} to {} ...", sender, recipients);
-            MimeMessage mimeMessage = createEmail(sender, recipients, String.format("Org Monitor %TF %<TR", new Date()), content);
-            Message message = sendMessage("me", mimeMessage);
-            return message.getId();
-        } catch (MessagingException | IOException e) {
-            log.error("Unable to send message!", e);
-            return null;
-        }
+    public MailingService(Config config) {
+        this.config = config;
     }
 
+    public boolean send(String content) {
+        try {
+            log.info("Creating email from {} to {} ...", config.getSender(), config.getRecipients());
+            MimeMessage mimeMessage = createEmail(
+                    config.getSender(),
+                    config.getRecipients(),
+                    String.format("Org Monitor %TF %<TR", new Date()),
+                    content);
+            Transport.send(mimeMessage);
+            return true;
+        } catch (MessagingException e) {
+            log.error("Unable to send message!", e);
+            return false;
+        }
+    }
 
     private MimeMessage createEmail(
             String from,
@@ -51,8 +45,19 @@ public class MailingService {
             String subject,
             String bodyText)
             throws MessagingException {
+
         Properties props = new Properties();
-        Session session = Session.getDefaultInstance(props, null);
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", config.getSmtpHost());
+        props.put("mail.smtp.port", config.getSmtpPort());
+
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(config.getSmtpUsername(), config.getSmtpPassword());
+                    }
+                });
 
         MimeMessage email = new MimeMessage(session);
 
@@ -65,27 +70,4 @@ public class MailingService {
         email.setText(bodyText, "UTF-8", "html");
         return email;
     }
-
-    private Message createMessageWithEmail(
-            MimeMessage emailContent)
-            throws MessagingException, IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        emailContent.writeTo(buffer);
-        byte[] bytes = buffer.toByteArray();
-        String encodedEmail = Base64.encodeBase64URLSafeString(bytes);
-        Message message = new Message();
-        message.setRaw(encodedEmail);
-        return message;
-    }
-
-    private Message sendMessage(
-            String userId,
-            MimeMessage emailContent)
-            throws MessagingException, IOException {
-        Message message = createMessageWithEmail(emailContent);
-        message = gmail.users().messages().send(userId, message).execute();
-        log.info("Message: {}", message.toPrettyString());
-        return message;
-    }
-
 }

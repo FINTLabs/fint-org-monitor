@@ -1,3 +1,10 @@
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: org-monitor-viken
+spec:
+  itemPath: "vaults/aks-beta-vault/items/org-monitor-viken"
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -13,29 +20,20 @@ spec:
       labels:
         name: org-monitor-viken-no
     spec:
-      volumes:
-        - name: credentials
-          secret:
-            secretName: google-service-account-gmail
       containers:
         - name: viken-no
-          image: fintlabs.azurecr.io/org-monitor:build.2
-          volumeMounts:
-            - mountPath: /credentials
-              name: credentials
+          image: fintlabs.azurecr.io/org-monitor:dummy
           envFrom:
             - configMapRef:
                 name: fint-environment
             - secretRef:
-                name: client-asgeir-viken
+                name: org-monitor-viken
           env:
             - {name: fint.orgmonitor.endpoint, value: 'https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'}
-            - {name: fint.orgmonitor.serviceaccount, value: '/credentials/serviceaccount.json'}
-            - {name: fint.orgmonitor.gmail.delegate, value: 'asgeir@fintlabs.no'}
             - {name: fint.orgmonitor.application-name, value: 'FINT Organization Monitor for Viken Fylkeskommune'}
             - {name: fint.orgmonitor.orgid, value: 'viken.no'}
-            - {name: fint.orgmonitor.recipients, value: 'asgeir@fintlabs.no'}
-            - {name: fint.orgmonitor.sender, value: 'asgeir@fintlabs.no'}
+            - {name: fint.orgmonitor.recipients, value: 'henrik@fintlabs.no'}
+            - {name: fint.orgmonitor.sender, value: 'henknut@outlook.com'}
             - {name: fint.orgmonitor.interval, value: '3600000'}
             - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-mongo}}}
-            - {name: spring.data.mongodb.database, value: 'org-monitor'}
+            - {name: spring.data.mongodb.database, value: 'org-monitor-api'}

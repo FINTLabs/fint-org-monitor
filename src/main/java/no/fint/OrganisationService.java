@@ -5,17 +5,17 @@ import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -23,13 +23,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class OrganisationService {
 
-    @Autowired
-    @Qualifier("endpoint")
-    private String endpoint;
+    private final Config config;
 
-    @Autowired
-    @Qualifier("orgid")
-    private String orgid;
+    public OrganisationService(Config config) {
+        this.config = config;
+    }
 
     @Autowired
     private RestUtil restUtil;
@@ -49,26 +47,26 @@ public class OrganisationService {
         List<Tuple2<OrganisationDocument, OrganisationDocument>> updated = new ArrayList<>();
         List<OrganisationDocument> updatedDocuments = new ArrayList<>();
 
-        List<OrganisationDocument> documents = repository.getAllByOrgId(orgid);
+        List<OrganisationDocument> documents = repository.getAllByOrgId(config.getOrgid());
         log.info("Repository contains {} documents.", documents.size());
 
         Map<String, OrganisationDocument> organisationMap = documents.stream().collect(Collectors.toMap(r -> r.getData().getOrganisasjonsId().getIdentifikatorverdi(), Function.identity()));
 
-        Resources<Resource<Organisasjonselement>> updates = restUtil.getUpdates(new ParameterizedTypeReference<Resources<Resource<Organisasjonselement>>>() {
-        }, endpoint);
+        CollectionModel<EntityModel<Organisasjonselement>> updates = restUtil.getUpdates(new ParameterizedTypeReference<CollectionModel<EntityModel<Organisasjonselement>>>() {
+        }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
-        for (Resource<Organisasjonselement> resource : updates.getContent()) {
-            String id = resource.getContent().getOrganisasjonsId().getIdentifikatorverdi();
+        for (EntityModel<Organisasjonselement> entityModel : updates.getContent()) {
+            String id = entityModel.getContent().getOrganisasjonsId().getIdentifikatorverdi();
 
             OrganisationDocument current = organisationMap.get(id);
 
             if (current == null) {
-                OrganisationDocument document = createDocument(resource);
+                OrganisationDocument document = createDocument(entityModel);
                 updatedDocuments.add(document);
                 added.add(document);
             } else {
-                OrganisationDocument modified = createDocument(resource);
+                OrganisationDocument modified = createDocument(entityModel);
                 if (!modified.equals(current)) {
                     modified.setId(current.getId());
                     updatedDocuments.add(modified);
@@ -78,7 +76,7 @@ public class OrganisationService {
         }
 
         log.info("Saving {} updates ...", updatedDocuments.size());
-        repository.save(updatedDocuments);
+        repository.saveAll(updatedDocuments);
 
         log.info("Added: {} items", added.size());
 
@@ -90,15 +88,13 @@ public class OrganisationService {
         }
     }
 
-    private OrganisationDocument createDocument(Resource<Organisasjonselement> resource) {
+    private OrganisationDocument createDocument(EntityModel<Organisasjonselement> entityModel) {
         OrganisationDocument document = new OrganisationDocument();
-        document.setOrgId(orgid);
-        document.setData(resource.getContent());
-        Link overordnet = resource.getLink("overordnet");
-        if (overordnet != null) {
-            document.setOverordnet(overordnet.getHref());
-        }
-        document.setUnderordnet(resource.getLinks().stream().filter(it -> it.getRel().equals("underordnet")).map(Link::getHref).collect(Collectors.toList()));
+        document.setOrgId(config.getOrgid());
+        document.setData(entityModel.getContent());
+        Optional<Link> overordnet = entityModel.getLink("overordnet");
+        overordnet.ifPresent(link -> document.setOverordnet(link.getHref()));
+        document.setUnderordnet(entityModel.getLinks().stream().filter(it -> it.getRel().value().equals("underordnet")).map(Link::getHref).collect(Collectors.toList()));
         return document;
     }
 }

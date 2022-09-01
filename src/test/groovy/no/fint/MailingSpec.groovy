@@ -4,15 +4,16 @@ package no.fint
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
+import spock.lang.Ignore
 import spock.lang.Requires
 import spock.lang.Specification
 
 import java.nio.file.Files
 import java.nio.file.Paths
 
+@Ignore
 @SpringBootTest
 @ActiveProfiles('test')
-@Requires({ Files.exists(Paths.get('serviceaccount.json')) })
 class MailingSpec extends Specification{
 
     @Autowired
