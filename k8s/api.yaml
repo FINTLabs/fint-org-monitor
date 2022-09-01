@@ -11,6 +11,9 @@ metadata:
   name: org-monitor-viken-no
   labels:
     name: org-monitor-viken-no
+  annotations:
+    operator.1password.io/item-path: "vaults/aks-api-vault/items/org-monitor-viken"
+    operator.1password.io/item-name: "org-monitor-viken"
 spec:
   selector:
     matchLabels:
