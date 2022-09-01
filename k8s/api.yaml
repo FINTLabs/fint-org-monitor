@@ -38,5 +38,5 @@ spec:
             - {name: fint.orgmonitor.recipients, value: 'henrik@fintlabs.no'}
             - {name: fint.orgmonitor.sender, value: 'henknut@outlook.com'}
             - {name: fint.orgmonitor.interval, value: '3600000'}
-            - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-mongo}}}
+            - {name: spring.data.mongodb.uri, valueFrom: { secretKeyRef: { key: mongodb, name: fint-mongo-db}}}
             - {name: spring.data.mongodb.database, value: 'org-monitor-api'}
