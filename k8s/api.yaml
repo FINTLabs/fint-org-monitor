@@ -22,7 +22,7 @@ spec:
     spec:
       containers:
         - name: viken-no
-          image: fintlabs.azurecr.io/org-monitor:dummy
+          image: fintlabs.azurecr.io/fint-org-monitor:dummy
           envFrom:
             - configMapRef:
                 name: fint-environment
