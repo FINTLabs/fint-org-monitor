@@ -3,7 +3,7 @@ kind: OnePasswordItem
 metadata:
   name: org-monitor-viken
 spec:
-  itemPath: "vaults/aks-beta-vault/items/org-monitor-viken"
+  itemPath: "vaults/aks-api-vault/items/org-monitor-viken"
 ---
 kind: Deployment
 apiVersion: apps/v1
