@@ -10,11 +10,10 @@ fint:
 
   orgmonitor:
     recipients: ''
-    sender: ''
     endpoint: 'https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'
     orgid: 'fintlabs.no'
     interval: 300000
     smtpUsername: ''
     smtpPassword: ''
-    smtpHost: '587'
-    smtpPort: 'outlook.office365.com'
+    smtpHost: 'outlook.office365.com'
+    smtpPort: '587'

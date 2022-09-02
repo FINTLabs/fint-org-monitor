@@ -15,7 +15,7 @@ public class FintMimeMessage {
     public FintMimeMessage(Config config, String content, String subject) throws MessagingException {
         mimeMessage = new MimeMessage(createSession(config));
 
-        mimeMessage.setFrom(new InternetAddress(config.getSender()));
+        mimeMessage.setFrom(new InternetAddress(config.getSmtpUsername()));
 
         for (String recipient : config.getRecipients()) { addRecipient(recipient); }
         mimeMessage.setSubject(subject);
