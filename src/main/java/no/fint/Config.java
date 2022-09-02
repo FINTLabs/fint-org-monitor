@@ -28,8 +28,6 @@ public class Config {
 
     private String smtpPort;
 
-    private String sender;
-
     private List<String> recipients;
 
 }

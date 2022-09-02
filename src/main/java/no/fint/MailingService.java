@@ -25,16 +25,17 @@ public class MailingService {
 
     public boolean send(String content) {
         try {
-            log.info("Creating email from {} to {} ...", config.getSender(), config.getRecipients());
+            log.info("Creating email from {} to {} ...", config.getSmtpUsername(), config.getRecipients());
             MimeMessage mimeMessage = createEmail(
-                    config.getSender(),
+                    config.getSmtpUsername(),
                     config.getRecipients(),
                     String.format("Org Monitor %TF %<TR", new Date()),
                     content);
             Transport.send(mimeMessage);
             return true;
         } catch (MessagingException e) {
-            log.error("Unable to send message!", e);
+            log.error("Unable to send message! \nsmtpUsername: {} smtpHost: {} smtpPort: {}",
+                    config.getSmtpUsername(), config.getSmtpHost(), config.getSmtpPort(), e);
             return false;
         }
     }
