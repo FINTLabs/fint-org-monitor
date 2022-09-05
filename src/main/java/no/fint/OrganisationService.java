@@ -1,21 +1,20 @@
 package no.fint;
 
 import lombok.extern.slf4j.Slf4j;
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
+import no.fint.model.resource.Link;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.Link;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,26 +51,33 @@ public class OrganisationService {
 
         Map<String, OrganisationDocument> organisationMap = documents.stream().collect(Collectors.toMap(r -> r.getData().getOrganisasjonsId().getIdentifikatorverdi(), Function.identity()));
 
-        CollectionModel<EntityModel<Organisasjonselement>> updates = restUtil.getUpdates(new ParameterizedTypeReference<>() {
+
+        OrganisasjonselementResources updates = restUtil.getUpdates(new ParameterizedTypeReference<>() {
         }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
-        for (EntityModel<Organisasjonselement> entityModel : updates.getContent()) {
-            String id = entityModel.getContent().getOrganisasjonsId().getIdentifikatorverdi();
+
+        for (OrganisasjonselementResource entityModel : updates.getContent()) {
+            String id = entityModel.getOrganisasjonsId().getIdentifikatorverdi();
 
             OrganisationDocument current = organisationMap.get(id);
 
-            if (current == null) {
-                OrganisationDocument document = createDocument(entityModel);
-                updatedDocuments.add(document);
-                added.add(document);
-            } else {
-                OrganisationDocument modified = createDocument(entityModel);
-                if (!modified.equals(current)) {
-                    modified.setId(current.getId());
-                    updatedDocuments.add(modified);
-                    updated.add(Tuple.tuple(current, modified));
+            try {
+                if (current == null) {
+                    OrganisationDocument document = createDocument(entityModel);
+                    updatedDocuments.add(document);
+                    added.add(document);
+                } else {
+                    OrganisationDocument modified = createDocument(entityModel);
+                    if (!modified.equals(current)) {
+                        modified.setId(current.getId());
+                        updatedDocuments.add(modified);
+                        updated.add(Tuple.tuple(current, modified));
+                    }
                 }
+            } catch (IOException e) {
+                log.error("Error converting element", e);
+                throw new RuntimeException(e);
             }
         }
 
@@ -88,13 +94,22 @@ public class OrganisationService {
         }
     }
 
-    private OrganisationDocument createDocument(EntityModel<Organisasjonselement> entityModel) {
+    private OrganisationDocument createDocument(OrganisasjonselementResource resource) throws IOException {
         OrganisationDocument document = new OrganisationDocument();
         document.setOrgId(config.getOrgid());
-        document.setData(entityModel.getContent());
-        Optional<Link> overordnet = entityModel.getLink("overordnet");
-        overordnet.ifPresent(link -> document.setOverordnet(link.getHref()));
-        document.setUnderordnet(entityModel.getLinks().stream().filter(it -> it.getRel().value().equals("underordnet")).map(Link::getHref).collect(Collectors.toList()));
+        document.setData(ResourceConverter.toOrganisasjonselement(resource));
+
+        if (resource.getOverordnet().size() > 0) {
+            document.setOverordnet(resource.getOverordnet().get(0).getHref());
+        }
+
+        document.setUnderordnet(
+                resource
+                        .getUnderordnet()
+                        .stream()
+                        .map(Link::getHref)
+                        .collect(Collectors.toList()));
+
         return document;
     }
 }
