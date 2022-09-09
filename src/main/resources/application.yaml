@@ -17,3 +17,9 @@ fint:
     smtpPassword: ''
     smtpHost: 'outlook.office365.com'
     smtpPort: '587'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
