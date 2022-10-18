@@ -3,6 +3,7 @@ package no.fint;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
+import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
