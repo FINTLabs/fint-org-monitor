@@ -15,7 +15,7 @@ public class FintMimeMessage {
     public FintMimeMessage(Config config, String content, String subject) throws MessagingException {
         mimeMessage = new MimeMessage(createSession(config));
 
-        mimeMessage.setFrom(new InternetAddress(config.getSmtpUsername()));
+        mimeMessage.setFrom(new InternetAddress(config.getSender()));
 
         for (String recipient : config.getRecipients()) { addRecipient(recipient); }
         mimeMessage.setSubject(subject);
@@ -30,7 +30,7 @@ public class FintMimeMessage {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.host", config.getSmtpHost());
+        props.put("mail.smtp.host", config.getSmtpServer());
         props.put("mail.smtp.port", config.getSmtpPort());
 
         return Session.getInstance(props,
