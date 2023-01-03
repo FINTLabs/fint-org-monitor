@@ -23,16 +23,12 @@ public class Config {
 
     private String sender;
 
-    @Value("smtp-username")
     private String smtpUsername;
 
-    @Value("smtp-password")
     private String smtpPassword;
 
-    @Value("smtp-server")
     private String smtpServer;
 
-    @Value("smtp-port")
     private String smtpPort;
 
     private List<String> recipients;
