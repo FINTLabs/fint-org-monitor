@@ -12,7 +12,7 @@ fint:
     recipients: ''
     endpoint: 'https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'
     orgid: 'fintlabs.no'
-    interval: 300000
+    cron: '0 15 8-14/2 * * *'
     smtpUsername: ''
     smtpPassword: ''
     smtpHost: 'outlook.office365.com'

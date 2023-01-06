@@ -40,7 +40,7 @@ public class OrganisationService {
     @Autowired
     private MailingService mailingService;
 
-    @Scheduled(initialDelay = 10000L, fixedDelayString = "${fint.orgmonitor.interval}")
+    @Scheduled(cron = "${fint.orgmonitor.cron}")
     public void update() {
         List<OrganisationDocument> added = new ArrayList<>();
         List<Tuple2<OrganisationDocument, OrganisationDocument>> updated = new ArrayList<>();
