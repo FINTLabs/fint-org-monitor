@@ -115,13 +115,13 @@ jobs:
 
 ## PWF cluster ##
 
-      - uses: azure/login@v1
-        with:
+#      - uses: azure/login@v1
+#        with:
 #         creds: '${{ secrets.AKS_PWF_FINT_GITHUB }}'
 
-      - uses: azure/use-kubelogin@v1.1
-        with:
-          kubelogin-version: 'v0.0.26'
+#      - uses: azure/use-kubelogin@v1.1
+#        with:
+#          kubelogin-version: 'v0.0.26'
 
 #      - name: Set the target PWF cluster.
 #        uses: azure/aks-set-context@v3
