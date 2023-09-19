@@ -22,3 +22,14 @@ patches:
     target:
       kind: Application
       name: fint-org-monitor
+
+  - patch: |-
+      - op: replace
+        path: "/metadata/labels/app.kubernetes.io~1instance"
+        value: "fint-org-monitor-client_viken_no"
+      - op: replace
+        path: "/spec/orgId"
+        value: "viken.no"
+    target:
+      kind: FintClient
+      name: fint-org-monitor-client

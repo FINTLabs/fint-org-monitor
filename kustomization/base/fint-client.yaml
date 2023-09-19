@@ -1,0 +1,18 @@
+apiVersion: fintlabs.no/v1alpha1
+kind: FintClient
+metadata:
+  name: fint-org-monitor-client
+  namespace: fintlabs-no
+  labels:
+    app.kubernetes.io/name: fint-org-monitor-client
+    app.kubernetes.io/instance: fint-org-monitor-client_fintlabs_no
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-core
+    fintlabs.no/team: core
+    fintlabs.no/org-id: fintlabs.no
+spec:
+  orgId: fintlabs.no
+  note: Brukes av FINT til å hente organisasjoner til org-monitor tjenesten
+  components:
+    - administrasjon_organisasjon

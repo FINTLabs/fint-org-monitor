@@ -1,9 +1,9 @@
 fint:
   oauth:
     access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
-    client-id:
-    client-secret:
+    username: ${fint.core.oauth2.username}
+    password: ${fint.core.oauth2.password}
+    client-id: ${fint.core.oauth2.client-id}
+    client-secret: ${fint.core.oauth2.client-secret}
     enabled: true
-    password:
     scope: fint-client
-    username:
