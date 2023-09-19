@@ -1,4 +1,4 @@
-package no.fint;
+package no.fint.utils;
 
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Service;

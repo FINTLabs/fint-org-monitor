@@ -3,6 +3,7 @@ package no.fint
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
+import no.fint.utils.TemplateService
 import org.jooq.lambda.tuple.Tuple2
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
