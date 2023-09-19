@@ -53,7 +53,10 @@ jobs:
     strategy:
       matrix:
         org:
-          - fintlabs-no
+          - viken-no
+          - bfk-no
+          - ofk-no
+          - afk-no
         cluster:
           - aks-api-fint-2022-02-08
 
