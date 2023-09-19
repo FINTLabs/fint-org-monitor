@@ -21,14 +21,25 @@ public class MailingService {
     public boolean send(String content) {
         try {
             log.info("Creating email from {} to {} ...", config.getSender(), config.getRecipients());
-            String subject = String.format("Org Monitor %TF %<TR", new Date());
-            MimeMessage mimeMessage = new FintMimeMessage(config, content, subject).getMail();
-            Transport.send(mimeMessage);
+            Transport.send(createMimeMessage(content));
             return true;
         } catch (MessagingException e) {
-            log.error("Unable to send message! smtpUsername: {} smtpHost: {} smtpPort: {}",
-                    config.getSmtpUsername(), config.getSmtpServer(), config.getSmtpPort(), e);
+            logSendEmailError(e);
             return false;
         }
+    }
+
+    private MimeMessage createMimeMessage(String content) throws MessagingException {
+        String subject = generateSubject();
+        return new FintMimeMessage(config, content, subject).getMail();
+    }
+
+    private String generateSubject() {
+        return String.format("Org Monitor %TF %<TR", new Date());
+    }
+
+    private void logSendEmailError(MessagingException e) {
+        log.error("Unable to send message! smtpUsername: {} smtpHost: {} smtpPort: {}",
+                config.getSmtpUsername(), config.getSmtpServer(), config.getSmtpPort(), e);
     }
 }
