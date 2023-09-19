@@ -25,11 +25,8 @@ spec:
       value: drift@vigoiks.no
     - name: fint.orgmonitor.recipients
       value: grethem@viken.no
-  envFrom:
-    - secretRef:
-        name: org-monitor-viken
   onePassword:
-    itemPath: vaults/aks-api-vault/items/org-monitor-viken
+    itemPath: vaults/aks-api-vault/items/fint-org-monitor-smtp
   resources:
     limits:
       memory: 512Mi
