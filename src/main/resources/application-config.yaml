@@ -1,0 +1,13 @@
+fint:
+  orgmonitor:
+    application-name: FINT Organization Monitor
+    recipients:
+    endpoint: "${fint.relations.default-base-url}/administrasjon/organisasjon/organisasjonselement"
+    orgid: ${fint.org-id}
+    cron: '0 15 8-14/2 * * *'
+    interval: 3600000
+    smtpUsername:
+    smtpPassword:
+    smtpServer:
+    smtpHost: outlook.office365.com
+    smtpPort: 587

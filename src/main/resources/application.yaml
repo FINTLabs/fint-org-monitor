@@ -1,25 +1,11 @@
-fint:
-  oauth:
-    access-token-uri: ''
-    client-id: ''
-    client-secret: ''
-    enabled: true
-    password: ''
-    scope: ''
-    username: ''
-
-  orgmonitor:
-    recipients: ''
-    endpoint: 'https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement'
-    orgid: 'fintlabs.no'
-    cron: '0 15 8-14/2 * * *'
-    smtpUsername: ''
-    smtpPassword: ''
-    smtpHost: 'outlook.office365.com'
-    smtpPort: '587'
-
 management:
   endpoints:
     web:
       exposure:
         include: health,info,prometheus
+
+spring:
+  profiles:
+    include:
+      - oauth
+      - config
