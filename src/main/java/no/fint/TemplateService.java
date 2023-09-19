@@ -1,7 +1,6 @@
 package no.fint;
 
 import org.jooq.lambda.tuple.Tuple2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -12,8 +11,11 @@ import java.util.List;
 @Service
 public class TemplateService {
 
-    @Autowired
-    private TemplateEngine templateEngine;
+    private final TemplateEngine templateEngine;
+
+    public TemplateService(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
 
     public String render(List<OrganizationDocument> added, List<Tuple2<OrganizationDocument, OrganizationDocument>> updated) {
         Context context = new Context();
