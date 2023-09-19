@@ -6,7 +6,6 @@ import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementRe
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,22 +22,18 @@ import java.util.stream.Collectors;
 public class OrganisationService {
 
     private final Config config;
+    private final RestUtil restUtil;
+    private final OrganisationRepository repository;
+    private final TemplateService templateService;
+    private final MailingService mailingService;
 
-    public OrganisationService(Config config) {
+    public OrganisationService(Config config, RestUtil restUtil, OrganisationRepository repository, TemplateService templateService, MailingService mailingService) {
         this.config = config;
+        this.restUtil = restUtil;
+        this.repository = repository;
+        this.templateService = templateService;
+        this.mailingService = mailingService;
     }
-
-    @Autowired
-    private RestUtil restUtil;
-
-    @Autowired
-    private OrganisationRepository repository;
-
-    @Autowired
-    private TemplateService templateService;
-
-    @Autowired
-    private MailingService mailingService;
 
     @Scheduled(cron = "${fint.orgmonitor.cron}")
     public void update() {

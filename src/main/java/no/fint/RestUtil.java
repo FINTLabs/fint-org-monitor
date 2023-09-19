@@ -1,7 +1,6 @@
 package no.fint;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +16,13 @@ import java.util.concurrent.ConcurrentSkipListMap;
 @Component
 public class RestUtil {
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final ConcurrentMap<String, Long> lastUpdatedMap;
 
-    private final ConcurrentMap<String, Long> lastUpdatedMap = new ConcurrentSkipListMap<>();
+    public RestUtil(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+        lastUpdatedMap = new ConcurrentSkipListMap<>();
+    }
 
     public <T> T getUpdates(ParameterizedTypeReference<T> type, String uri) {
         long lastUpdated = Long.parseLong(
