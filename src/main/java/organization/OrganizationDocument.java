@@ -1,9 +1,8 @@
-package no.fint;
+package organization;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement;
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Document
 @Data
-public class OrganisationDocument {
+public class OrganizationDocument {
     @Id
     @EqualsAndHashCode.Exclude
     private String id;

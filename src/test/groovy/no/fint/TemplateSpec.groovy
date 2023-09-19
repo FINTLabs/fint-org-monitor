@@ -7,11 +7,8 @@ import org.jooq.lambda.tuple.Tuple2
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import spock.lang.Requires
+import organization.OrganizationDocument
 import spock.lang.Specification
-
-import java.nio.file.Files
-import java.nio.file.Paths
 
 @SpringBootTest
 @ActiveProfiles('test')
@@ -23,7 +20,7 @@ class TemplateSpec extends Specification{
     def 'Template renders properly'() {
         given:
         def added = [
-                new OrganisationDocument(
+                new OrganizationDocument(
                         data: new Organisasjonselement(
                                 navn: 'En liten test',
                                 kortnavn: 'test',
@@ -34,7 +31,7 @@ class TemplateSpec extends Specification{
         ]
         def updated = [
                 Tuple2.tuple(
-                        new OrganisationDocument(
+                        new OrganizationDocument(
                                 data: new Organisasjonselement(
                                         navn: 'Gammelt navn',
                                         kortnavn: 'gammel',
@@ -42,7 +39,7 @@ class TemplateSpec extends Specification{
                                         organisasjonsId: new Identifikator(identifikatorverdi: '2')
                                 )
                         ),
-                        new OrganisationDocument(
+                        new OrganizationDocument(
                                 data: new Organisasjonselement(
                                         navn: 'Nytt navn',
                                         kortnavn: 'ny',
@@ -78,7 +75,7 @@ class TemplateSpec extends Specification{
     def 'Renders example JSON'() {
         given:
         def json = new ObjectMapper()
-        def org = json.readValue(getClass().getResourceAsStream('/testorg.json'), OrganisationDocument)
+        def org = json.readValue(getClass().getResourceAsStream('/testorg.json'), OrganizationDocument)
 
         when:
         println(org)

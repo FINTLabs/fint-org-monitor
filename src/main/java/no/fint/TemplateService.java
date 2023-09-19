@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.context.IContext;
+import organization.OrganizationDocument;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class TemplateService {
     @Autowired
     private TemplateEngine templateEngine;
 
-    public String render(List<OrganisationDocument> added, List<Tuple2<OrganisationDocument, OrganisationDocument>> updated) {
+    public String render(List<OrganizationDocument> added, List<Tuple2<OrganizationDocument, OrganizationDocument>> updated) {
         Context context = new Context();
         context.setVariable("added", added);
         context.setVariable("updated", updated);

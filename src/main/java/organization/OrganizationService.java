@@ -1,6 +1,7 @@
-package no.fint;
+package organization;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.*;
 import no.fint.model.resource.Link;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource;
 import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources;
@@ -19,15 +20,15 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class OrganisationService {
+public class OrganizationService {
 
     private final Config config;
     private final RestUtil restUtil;
-    private final OrganisationRepository repository;
+    private final OrganizationRepository repository;
     private final TemplateService templateService;
     private final MailingService mailingService;
 
-    public OrganisationService(Config config, RestUtil restUtil, OrganisationRepository repository, TemplateService templateService, MailingService mailingService) {
+    public OrganizationService(Config config, RestUtil restUtil, OrganizationRepository repository, TemplateService templateService, MailingService mailingService) {
         this.config = config;
         this.restUtil = restUtil;
         this.repository = repository;
@@ -37,14 +38,14 @@ public class OrganisationService {
 
     @Scheduled(cron = "${fint.orgmonitor.cron}")
     public void update() {
-        List<OrganisationDocument> added = new ArrayList<>();
-        List<Tuple2<OrganisationDocument, OrganisationDocument>> updated = new ArrayList<>();
-        List<OrganisationDocument> updatedDocuments = new ArrayList<>();
+        List<OrganizationDocument> added = new ArrayList<>();
+        List<Tuple2<OrganizationDocument, OrganizationDocument>> updated = new ArrayList<>();
+        List<OrganizationDocument> updatedDocuments = new ArrayList<>();
 
-        List<OrganisationDocument> documents = repository.getAllByOrgId(config.getOrgid());
+        List<OrganizationDocument> documents = repository.getAllByOrgId(config.getOrgid());
         log.info("Repository contains {} documents.", documents.size());
 
-        Map<String, OrganisationDocument> organisationMap = documents.stream().collect(Collectors.toMap(r -> r.getData().getOrganisasjonsId().getIdentifikatorverdi(), Function.identity()));
+        Map<String, OrganizationDocument> organisationMap = documents.stream().collect(Collectors.toMap(r -> r.getData().getOrganisasjonsId().getIdentifikatorverdi(), Function.identity()));
 
 
         OrganisasjonselementResources updates = restUtil.getUpdates(new ParameterizedTypeReference<>() {
@@ -55,15 +56,15 @@ public class OrganisationService {
         for (OrganisasjonselementResource entityModel : updates.getContent()) {
             String id = entityModel.getOrganisasjonsId().getIdentifikatorverdi();
 
-            OrganisationDocument current = organisationMap.get(id);
+            OrganizationDocument current = organisationMap.get(id);
 
             try {
                 if (current == null) {
-                    OrganisationDocument document = createDocument(entityModel);
+                    OrganizationDocument document = createDocument(entityModel);
                     updatedDocuments.add(document);
                     added.add(document);
                 } else {
-                    OrganisationDocument modified = createDocument(entityModel);
+                    OrganizationDocument modified = createDocument(entityModel);
                     if (!modified.equals(current)) {
                         modified.setId(current.getId());
                         updatedDocuments.add(modified);
@@ -89,8 +90,8 @@ public class OrganisationService {
         }
     }
 
-    private OrganisationDocument createDocument(OrganisasjonselementResource resource) throws IOException {
-        OrganisationDocument document = new OrganisationDocument();
+    private OrganizationDocument createDocument(OrganisasjonselementResource resource) throws IOException {
+        OrganizationDocument document = new OrganizationDocument();
         document.setOrgId(config.getOrgid());
         document.setData(ResourceConverter.toOrganisasjonselement(resource));
 
