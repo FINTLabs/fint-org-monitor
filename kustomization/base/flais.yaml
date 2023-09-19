@@ -1,0 +1,54 @@
+apiVersion: fintlabs.no/v1alpha1
+kind: Application
+metadata:
+  name: fint-org-monitor
+  namespace: fintlabs-no
+  labels:
+    app.kubernetes.io/name: fint-org-monitor
+    app.kubernetes.io/instance: fint-org-monitor_fintlabs_no
+    app.kubernetes.io/version: latest
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: fint-core
+    fintlabs.no/team: core
+    fintlabs.no/org-id: fintlabs.no
+spec:
+  port: 8080
+  orgId: fintlabs.no
+  image: docker/getting-started
+  imagePullPolicy: Always
+  prometheus:
+    enabled: true
+    port: '8080'
+    path: /actuator/prometheus
+  env:
+    - name: fint.orgmonitor.interval
+      value: '3600000'
+    - name: fint.orgmonitor.endpoint
+      value: https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
+    - name: fint.orgmonitor.application-name
+      value: FINT Organization Monitor for Viken Fylkeskommune
+    - name: fint.orgmonitor.orgid
+      value: viken.no
+    - name: fint.orgmonitor.sender
+      value: drift@vigoiks.no
+    - name: fint.orgmonitor.recipients
+      value: brukerhjelp@viken.no, grethem@viken.no
+  envFrom:
+    - secretRef:
+        name: org-monitor-viken
+  onePassword:
+    itemPath: vaults/aks-api-vault/items/org-monitor-viken
+  resources:
+    limits:
+      memory: 512Mi
+      cpu: 500m
+    requests:
+      memory: 256Mi
+      cpu: 250m
+  restartPolicy: Always
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
