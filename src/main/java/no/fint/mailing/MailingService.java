@@ -1,6 +1,7 @@
-package no.fint;
+package no.fint.mailing;
 
 import lombok.extern.slf4j.Slf4j;
+import no.fint.Config;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;

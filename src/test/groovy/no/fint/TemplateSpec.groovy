@@ -7,7 +7,7 @@ import org.jooq.lambda.tuple.Tuple2
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
-import organization.OrganizationDocument
+import no.fint.organization.OrganizationDocument
 import spock.lang.Specification
 
 @SpringBootTest

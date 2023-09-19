@@ -4,7 +4,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import organization.OrganizationDocument;
+import no.fint.organization.OrganizationDocument;
 
 import java.util.List;
 

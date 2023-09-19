@@ -1,4 +1,6 @@
-package no.fint;
+package no.fint.mailing;
+
+import no.fint.Config;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;

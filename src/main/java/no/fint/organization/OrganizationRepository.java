@@ -1,4 +1,4 @@
-package organization;
+package no.fint.organization;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

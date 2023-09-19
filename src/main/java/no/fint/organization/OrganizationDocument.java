@@ -1,4 +1,4 @@
-package organization;
+package no.fint.organization;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

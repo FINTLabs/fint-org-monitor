@@ -18,19 +18,12 @@ import java.util.List;
 public class Config {
 
     private String endpoint;
-
     private String orgid;
-
     private String sender;
-
     private String smtpUsername;
-
     private String smtpPassword;
-
     private String smtpServer;
-
     private String smtpPort;
-
     private List<String> recipients;
 
 }
