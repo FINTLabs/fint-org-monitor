@@ -21,18 +21,18 @@ spec:
     port: '8080'
     path: /actuator/prometheus
   env:
+    - name: fint.orgmonitor.orgid
+      value: viken.no
     - name: fint.orgmonitor.interval
       value: '3600000'
     - name: fint.orgmonitor.endpoint
       value: https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
     - name: fint.orgmonitor.application-name
       value: FINT Organization Monitor for Viken Fylkeskommune
-    - name: fint.orgmonitor.orgid
-      value: viken.no
     - name: fint.orgmonitor.sender
       value: drift@vigoiks.no
     - name: fint.orgmonitor.recipients
-      value: brukerhjelp@viken.no, grethem@viken.no
+      value: grethem@viken.no
   envFrom:
     - secretRef:
         name: org-monitor-viken
