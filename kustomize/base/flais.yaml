@@ -29,7 +29,7 @@ spec:
     - secretRef:
         name: fint-org-monitor-client
   onePassword:
-    itemPath: vaults/aks-api-vault/items/fint-org-monitor-smtp
+    itemPath: vaults/aks-api-vault/items/fint-org-monitor
   resources:
     limits:
       memory: 512Mi
