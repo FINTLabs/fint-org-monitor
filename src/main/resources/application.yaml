@@ -9,3 +9,4 @@ spring:
     include:
       - oauth
       - config
+      - database
