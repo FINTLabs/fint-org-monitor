@@ -1,8 +1,9 @@
 fint:
+  environment: api
   orgmonitor:
     application-name: FINT Organization Monitor
     recipients:
-    endpoint: "${fint.relations.default-base-url}/administrasjon/organisasjon/organisasjonselement"
+    endpoint: https://${fint.environment}.felleskomponent/administrasjon/organisasjon/organisasjonselement
     orgid: ${fint.org-id}
     cron: '0 15 8-14/2 * * *'
     interval: 3600000

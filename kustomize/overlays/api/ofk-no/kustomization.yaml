@@ -14,6 +14,9 @@ commonLabels:
 patches:
   - patch: |-
       - op: replace
+        path: "/spec/env/0/value"
+        value: "api"
+      - op: replace
         path: "/metadata/labels/app.kubernetes.io~1instance"
         value: "fint-org-monitor_ofk_no"
       - op: replace

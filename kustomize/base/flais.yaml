@@ -21,6 +21,8 @@ spec:
     port: '8080'
     path: /actuator/prometheus
   env:
+    - name: fint.environment
+      value: beta
     - name: fint.orgmonitor.sender
       value: drift@vigoiks.no
     - name: fint.orgmonitor.recipients
