@@ -36,7 +36,7 @@ public class MailingService {
     }
 
     private String generateSubject() {
-        return String.format("Org Monitor %TF %<TR", new Date());
+        return String.format("Org Monitor for %s %TF %<TR", config.getOrgid(), new Date());
     }
 
     private void logSendEmailError(MessagingException e) {
