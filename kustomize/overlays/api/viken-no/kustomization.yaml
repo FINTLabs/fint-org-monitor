@@ -17,6 +17,9 @@ patches:
         path: "/spec/env/0/value"
         value: "api"
       - op: replace
+        path: "/spec/env/2/value"
+        value: "brukerhjelp@viken.no"
+      - op: replace
         path: "/metadata/labels/app.kubernetes.io~1instance"
         value: "fint-org-monitor_viken_no"
       - op: replace
