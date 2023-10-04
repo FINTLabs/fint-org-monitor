@@ -1,0 +1,18 @@
+fint:
+  orgmonitor:
+    serviceaccount: serviceaccount.json
+    gmail:
+      delegate: asgeir@fintlabs.no
+    application-name: Test
+    recipients: asgeir@fintlabs.no
+    sender: asgeir@fintlabs.no
+    endpoint: https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
+    orgid: fintlabs.no
+    cron: "*/30 * * * * *"
+  core:
+    oauth2:
+      username: 123
+      password: 123
+      client-id: 123
+      client-secret: 123
+spring.data.mongodb.uri: mongodb://123
