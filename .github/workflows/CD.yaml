@@ -55,7 +55,7 @@ jobs:
     strategy:
       matrix:
         org:
-          - viken-no
+#          - viken-no
           - bfk-no
           - ofk-no
           - afk-no
