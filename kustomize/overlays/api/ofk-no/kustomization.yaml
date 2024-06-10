@@ -18,7 +18,7 @@ patches:
         value: "api"
       - op: replace
         path: "/spec/env/2/value"
-        value: "integrasjoner.elements@ofk.no"
+        value: "integrasjoner.elements@ofk.no, kristinj@ofk.no"
       - op: replace
         path: "/metadata/labels/app.kubernetes.io~1instance"
         value: "fint-org-monitor_ofk_no"
