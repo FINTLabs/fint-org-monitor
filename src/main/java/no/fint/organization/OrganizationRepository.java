@@ -9,4 +9,5 @@ import java.util.List;
 public interface OrganizationRepository extends MongoRepository<OrganizationDocument, String> {
 
     List<OrganizationDocument> getAllByOrgId(String orgid);
+    OrganizationDocument getOrganizationDocumentByIdAndOrgId(String id, String orgid);
 }

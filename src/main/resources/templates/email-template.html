@@ -38,5 +38,18 @@
         </li>
     </ol>
 </div>
+<div th:unless="${#lists.isEmpty(parentInfo)}">
+    <h2>Overordnede organisasjonsenheter:</h2>
+    <table>
+    <tr>
+        <th>Id</th>
+        <th>Navn</th>
+    </tr>
+    <tr th:each="item: ${parentInfo}">
+        <td th:text="${item.orgUnitId()}">...</td>
+        <td th:text="${item.orgUNitName()}">...</td>
+    </tr>
+    </table>
+</div>
 </body>
 </html>
