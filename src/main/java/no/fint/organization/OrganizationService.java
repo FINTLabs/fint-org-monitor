@@ -45,6 +45,7 @@ public class OrganizationService {
         List<OrganizationDocument> added = new ArrayList<>();
         List<Tuple2<OrganizationDocument, OrganizationDocument>> updated = new ArrayList<>();
         List<OrganizationDocument> updatedDocuments = new ArrayList<>();
+        List<String> parentIds = new ArrayList<>();
 
         List<OrganizationDocument> documents = repository.getAllByOrgId(config.getOrgid());
         log.info("Repository contains {} documents.", documents.size());
@@ -56,7 +57,6 @@ public class OrganizationService {
         }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
-
         for (OrganisasjonselementResource entityModel : updates.getContent()) {
             String id = entityModel.getOrganisasjonsId().getIdentifikatorverdi();
 
@@ -67,12 +67,24 @@ public class OrganizationService {
                     OrganizationDocument document = createDocument(entityModel);
                     updatedDocuments.add(document);
                     added.add(document);
+                    if (!document.getOverordnet().isEmpty()) {
+                        OrganizationDocument parent = organisationMap.get(document.overordnetId());
+                        if (parent != null && !parentIds.contains(parent.getId())) {
+                            parentIds.add(parent.getId());
+                        }
+                    }
                 } else {
                     OrganizationDocument modified = createDocument(entityModel);
                     if (!modified.equals(current)) {
                         modified.setId(current.getId());
                         updatedDocuments.add(modified);
                         updated.add(Tuple.tuple(current, modified));
+                        if (!modified.getOverordnet().isEmpty()) {
+                            OrganizationDocument parent = organisationMap.get(modified.overordnetId());
+                            if (parent != null && !parentIds.contains(parent.getId())) {
+                                parentIds.add(parent.getId());
+                            }
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -89,7 +101,8 @@ public class OrganizationService {
         log.info("Updated: {} items", updated.size());
 
         if (!added.isEmpty() || !updated.isEmpty()) {
-            String result = templateService.render(added, updated);
+            List<SimpleOrganizationInfo> parentInfo = parentIds.isEmpty() ? new ArrayList<>() : createParentInfo(parentIds);
+            String result = templateService.render(added, updated, parentInfo);
             mailingService.send(result);
         }
     }
@@ -99,10 +112,6 @@ public class OrganizationService {
         document.setOrgId(config.getOrgid());
         document.setData(ResourceConverter.toOrganisasjonselement(resource));
 
-        if (resource.getOverordnet().size() > 0) {
-            document.setOverordnet(resource.getOverordnet().get(0).getHref());
-        }
-
         document.setUnderordnet(
                 resource
                         .getUnderordnet()
@@ -111,5 +120,18 @@ public class OrganizationService {
                         .collect(Collectors.toList()));
 
         return document;
+    }
+
+    private List<SimpleOrganizationInfo> createParentInfo(List<String> parentIds) {
+            List<SimpleOrganizationInfo> parentInfo = new ArrayList<>();
+
+            for (String id : parentIds) {
+                OrganizationDocument document = repository.getOrganizationDocumentByIdAndOrgId(id, config.getOrgid());
+                if (document != null && document.getData().getNavn() !=null) {
+                    SimpleOrganizationInfo info = new SimpleOrganizationInfo(id, document.getData().getNavn());
+                    parentInfo.add(info);
+                }
+            }
+            return parentInfo;
     }
 }

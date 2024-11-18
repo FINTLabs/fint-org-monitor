@@ -3,6 +3,7 @@ package no.fint
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
+import no.fint.organization.SimpleOrganizationInfo
 import no.fint.utils.TemplateService
 import org.jooq.lambda.tuple.Tuple2
 import org.springframework.beans.factory.annotation.Autowired
@@ -50,9 +51,12 @@ class TemplateSpec extends Specification{
                         )
                 )
         ]
+        def parentInfo = [
+                new SimpleOrganizationInfo("1", "Østfold fylkeskommune")
+                ]
 
         when:
-        String result = templateService.render(added, updated)
+        String result = templateService.render(added, updated, parentInfo)
         println(result)
 
         then:
@@ -61,16 +65,18 @@ class TemplateSpec extends Specification{
         result.contains('En liten test')
         result.contains('Gammelt navn')
         result.contains('Nytt navn')
+        result.contains('Overordnede organisasjonsenheter:')
     }
 
     def 'Template renders with empty inputs'() {
         when:
-        String result = templateService.render([], [])
+        String result = templateService.render([], [], [])
         println(result)
 
         then:
         !result.contains('er nye:')
         !result.contains('er endret:')
+        !result.contains('Overordnede organisasjonsenheter:')
     }
 
     def 'Renders example JSON'() {
@@ -80,7 +86,7 @@ class TemplateSpec extends Specification{
 
         when:
         println(org)
-        def result = templateService.render([org], [])
+        def result = templateService.render([org], [], [])
         println(result)
 
         then:

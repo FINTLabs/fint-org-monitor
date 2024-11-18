@@ -1,5 +1,6 @@
 package no.fint.utils;
 
+import no.fint.organization.SimpleOrganizationInfo;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -17,10 +18,11 @@ public class TemplateService {
         this.templateEngine = templateEngine;
     }
 
-    public String render(List<OrganizationDocument> added, List<Tuple2<OrganizationDocument, OrganizationDocument>> updated) {
+    public String render(List<OrganizationDocument> added, List<Tuple2<OrganizationDocument, OrganizationDocument>> updated, List<SimpleOrganizationInfo> parentInfo) {
         Context context = new Context();
         context.setVariable("added", added);
         context.setVariable("updated", updated);
+        context.setVariable("parentInfo", parentInfo);
         return templateEngine.process("email-template", context);
     }
 }
