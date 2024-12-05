@@ -14,6 +14,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +68,7 @@ public class OrganizationService {
                     OrganizationDocument document = createDocument(entityModel);
                     updatedDocuments.add(document);
                     added.add(document);
-                    if (!document.getOverordnet().isEmpty()) {
+                    if (StringUtils.hasText(document.getOverordnet())) {
                         OrganizationDocument parent = organisationMap.get(document.overordnetId());
                         if (parent != null && !parentIds.contains(parent.getId())) {
                             parentIds.add(parent.getId());
@@ -79,7 +80,7 @@ public class OrganizationService {
                         modified.setId(current.getId());
                         updatedDocuments.add(modified);
                         updated.add(Tuple.tuple(current, modified));
-                        if (!modified.getOverordnet().isEmpty()) {
+                        if (StringUtils.hasText(modified.getOverordnet())) {
                             OrganizationDocument parent = organisationMap.get(modified.overordnetId());
                             if (parent != null && !parentIds.contains(parent.getId())) {
                                 parentIds.add(parent.getId());
