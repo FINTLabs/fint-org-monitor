@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+      database: org-monitor
+      uri: mongodb://localhost:27017/org-monitor
