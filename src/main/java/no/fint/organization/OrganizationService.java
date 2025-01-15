@@ -58,14 +58,14 @@ public class OrganizationService {
         }, config.getEndpoint());
         log.info("Found {} updates.", updates.getContent().size());
 
-        for (OrganisasjonselementResource entityModel : updates.getContent()) {
-            String id = entityModel.getOrganisasjonsId().getIdentifikatorverdi();
+        for (OrganisasjonselementResource resource : updates.getContent()) {
+            String id = resource.getOrganisasjonsId().getIdentifikatorverdi();
 
             OrganizationDocument current = organisationMap.get(id);
 
             try {
                 if (current == null) {
-                    OrganizationDocument document = createDocument(entityModel);
+                    OrganizationDocument document = createDocument(resource);
                     updatedDocuments.add(document);
                     added.add(document);
                     if (StringUtils.hasText(document.getOverordnet())) {
@@ -75,7 +75,7 @@ public class OrganizationService {
                         }
                     }
                 } else {
-                    OrganizationDocument modified = createDocument(entityModel);
+                    OrganizationDocument modified = createDocument(resource);
                     if (!modified.equals(current)) {
                         modified.setId(current.getId());
                         updatedDocuments.add(modified);
@@ -111,7 +111,16 @@ public class OrganizationService {
     private OrganizationDocument createDocument(OrganisasjonselementResource resource) throws IOException {
         OrganizationDocument document = new OrganizationDocument();
         document.setOrgId(config.getOrgid());
+
         document.setData(ResourceConverter.toOrganisasjonselement(resource));
+
+        document.setOverordnet(
+                resource
+                        .getOverordnet()
+                        .stream()
+                        .map(Link::getHref)
+                        .findFirst()
+                        .orElse(null));
 
         document.setUnderordnet(
                 resource
