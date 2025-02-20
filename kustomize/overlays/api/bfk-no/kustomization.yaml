@@ -3,14 +3,15 @@ kind: Kustomization
 namespace: bfk-no
 resources:
   - ../../../base
-commonLabels:
-  app.kubernetes.io/name: fint-org-monitor
-  app.kubernetes.io/instance: fint-org-monitor_bfk_no
-  app.kubernetes.io/version: latest
-  app.kubernetes.io/component: backend
-  app.kubernetes.io/part-of: fint-core
-  fintlabs.no/team: core
-  fintlabs.no/org-id: bfk.no
+labels:
+  - pairs:
+      app.kubernetes.io/name: fint-org-monitor
+      app.kubernetes.io/instance: fint-org-monitor_bfk_no
+      app.kubernetes.io/version: latest
+      app.kubernetes.io/component: backend
+      app.kubernetes.io/part-of: fint-core
+      fintlabs.no/team: core
+      fintlabs.no/org-id: bfk.no
 patches:
   - patch: |-
       - op: replace
