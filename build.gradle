@@ -40,7 +40,7 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
     implementation('com.sun.mail:javax.mail:1.6.2')
-    implementation('no.fint:fint-administrasjon-resource-model-java:3.18.0')
+    implementation('no.fint:fint-administrasjon-resource-model-java:3.10.0')
 
     implementation('no.fint:fint-oauth-token-service:+')
     implementation("no.fint:fint-administrasjon-model-java:${apiVersion}")
