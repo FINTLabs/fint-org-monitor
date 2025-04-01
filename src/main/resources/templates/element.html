@@ -24,6 +24,8 @@
     </table>
     <p>Overordnet: <span th:text="${item.overordnetId()}">over</span></p>
     <p>Underordnet: <span th:text="${#strings.listJoin(item.underordnetId(), ', ')}">under</span></p>
+    <p>GyldighetsPeriode start: <span th:text="${item.data.gyldighetsperiode.getStart()}">Start:</span></p>
+    <p>GyldighetsPeriode Slutt: <span th:text="${item.data.gyldighetsperiode.getSlutt}">Slutt:</span></p>
 </div>
 </body>
 </html>

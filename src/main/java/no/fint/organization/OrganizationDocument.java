@@ -26,7 +26,7 @@ public class OrganizationDocument {
     private String orgId;
 
     @Field
-    private Organisasjonselement data;
+    public Organisasjonselement data;
 
     @Field
     private String overordnet;

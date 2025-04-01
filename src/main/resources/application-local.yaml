@@ -3,3 +3,7 @@ spring:
     mongodb:
       database: org-monitor
       uri: mongodb://mongodb:mongodb@localhost:27017
+
+fint:
+  orgmonitor:
+    cron: "*/20 * * * * *"
