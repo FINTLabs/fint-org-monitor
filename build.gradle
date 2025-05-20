@@ -35,7 +35,7 @@ dependencies {
 
     implementation('org.jooq:jool-java-8:0.9.14')
     implementation('org.springframework.boot:spring-boot-starter')
-    implementation('org.springframework.boot:spring-boot-starter-data-mongodb')
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb:3.4.5'
     implementation('org.springframework.boot:spring-boot-starter-hateoas')
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
