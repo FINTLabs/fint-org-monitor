@@ -46,10 +46,10 @@ dependencies {
     implementation("no.fint:fint-administrasjon-model-java:${apiVersion}")
     implementation 'org.apache.commons:commons-lang3:3.9'
 
-    compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     testImplementation("cglib:cglib-nodep:3.3.0")
     testImplementation("org.spockframework:spock-spring:2.0-groovy-3.0")
