@@ -56,8 +56,8 @@ jobs:
       matrix:
         org:
 #          - viken-no
-          - bfk-no
-          - ofk-no
+#          - bfk-no
+#          - ofk-no
           - afk-no
         cluster:
           - aks-api-fint-2022-02-08
