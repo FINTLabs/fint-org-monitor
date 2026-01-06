@@ -26,9 +26,7 @@ jobs:
         uses: gradle/actions/wrapper-validation@v5
 
       - name: Gradle Setup
-        uses: gradle/gradle-build-action@v2.4.2
-        with:
-          gradle-version: wrapper
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Gradle build
         run: |
