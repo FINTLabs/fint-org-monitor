@@ -23,7 +23,7 @@ jobs:
           java-version: '17'
 
       - name: Gradle Wrapper Validation
-        uses: gradle/wrapper-validation-action@v1.1.0
+        uses: gradle/actions/wrapper-validation@v5
 
       - name: Gradle Setup
         uses: gradle/gradle-build-action@v2.4.2
