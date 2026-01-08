@@ -1,6 +1,5 @@
 package no.fint
 
-import lombok.RequiredArgsConstructor
 import no.fint.organization.OrganizationService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,7 +9,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
 @Component
-@RequiredArgsConstructor
 @ConditionalOnProperty(value = ["fint.sync.enabled"], havingValue = "true", matchIfMissing = true)
 class UpdateRunner : ApplicationRunner {
     private val logger = LoggerFactory.getLogger(UpdateRunner::class.java)

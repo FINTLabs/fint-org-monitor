@@ -1,6 +1,7 @@
 package no.fint.utils
 
 import org.slf4j.LoggerFactory
+import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
@@ -16,8 +17,9 @@ import java.util.concurrent.ConcurrentSkipListMap
  */
 @Component
 class RestUtil(
-    private val restTemplate: RestTemplate,
+    restTemplateBuilder: RestTemplateBuilder,
 ) {
+    private val restTemplate: RestTemplate = restTemplateBuilder.build()
     private val lastUpdatedMap: ConcurrentMap<String, Long> = ConcurrentSkipListMap()
 
     private val logger = LoggerFactory.getLogger(RestUtil::class.java)
@@ -36,7 +38,8 @@ class RestUtil(
         uri: String,
     ): T =
         lastUpdatedMap.getOrDefault(uri, 0L).let { since ->
-            logger.info("Fetching $uri since $since ...")
+            logger.info("Fetching $uri since $since")
+            // get all OrganisasjonsElement that was updated since timestamp `since`
             val result =
                 get(
                     type,
@@ -46,6 +49,7 @@ class RestUtil(
                         .build()
                         .toUriString(),
                 )
+            // get last-updated timestamp from API
             val lastUpdated =
                 requireNotNull(
                     get(
@@ -55,6 +59,7 @@ class RestUtil(
                             .fromUriString(uri)
                             .pathSegment("last-updated")
                             .build()
+                            .also { println(it) }
                             .toUriString(),
                     )["lastUpdated"],
                 ) { "No lastUpdated value from $uri" }.toLong()

@@ -1,0 +1,36 @@
+{
+  "orgId": "viken.no",
+  "data": {
+    "gyldighetsperiode": {
+      "start": "2019-04-01T00:00:00Z"
+    },
+    "kortnavn": "VGKALN",
+    "navn": "VGKALN Kalnes videregående skole",
+    "organisasjonsId": {
+      "identifikatorverdi": "762"
+    },
+    "organisasjonsKode": {
+      "identifikatorverdi": "V40.44.17"
+    },
+    "forretningsadresse": {
+      "adresselinje": [
+      ]
+    },
+    "organisasjonsnummer": {
+      "identifikatorverdi": "974544520"
+    },
+    "kontaktinformasjon": {},
+    "postadresse": {
+      "adresselinje": [
+      ]
+    }
+  },
+  "overordnet": "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/156",
+  "underordnet": [
+    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/763",
+    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/766",
+    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/770",
+    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/775",
+    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/776"
+  ]
+}

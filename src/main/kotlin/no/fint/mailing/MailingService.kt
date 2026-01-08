@@ -14,7 +14,7 @@ class MailingService(
     private val logger = LoggerFactory.getLogger(MailingService::class.java)
 
     fun send(content: String): Boolean {
-        logger.info("Sending email from ${config.sender} to ${config.recipients} ...")
+        logger.info("Sending email from ${config.sender} to ${config.recipients}")
         try {
             Transport.send(createMimeMessage(content))
         } catch (e: MessagingException) {
@@ -33,7 +33,7 @@ class MailingService(
 
     private fun logSendEmailError(e: MessagingException) {
         logger.error(
-            "Unable to send message! smtpUsername: ${config.smtpUsername}, smtpHost: ${config.smtpServer}, smtpPost: ${config.smtpPort}",
+            "Unable to send message! smtpUsername: ${config.smtpUsername}, smtpHost: ${config.smtpServer}, smtpPost: ${config.smtpPort}, Error: $e",
         )
     }
 }

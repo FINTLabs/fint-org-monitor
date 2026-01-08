@@ -33,13 +33,4 @@ data class OrganizationDocument(
     @LastModifiedDate
     @Column
     var lastModifiedDate: LocalDateTime? = null,
-) {
-    fun overordnetId(): String? = overordnet?.substringAfterLast("/")
-//    @field:Transient
-//    val overordnetId: String?
-//        get() = overordnet?.substringAfterLast("/")
-//
-//    @field:Transient
-//    val underordnetId: List<String>
-//        get() = underordnet?.map { it.substringAfterLast("/") } ?: emptyList()
-}
+)

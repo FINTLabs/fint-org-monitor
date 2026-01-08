@@ -1,5 +1,6 @@
 spring:
-  data:
-    mongodb:
-      database: org-monitor-api
-      uri: ${fint.database.uri}
+  flyway:
+    url: ${fint.database.url}
+    user: ${fint.database.username}
+    password: ${fint.database.password}
+    locations: classpath:db/migration

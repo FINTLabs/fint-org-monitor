@@ -12,6 +12,14 @@ import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 
+/**
+ * Service responsible for monitoring and updating organization elements.
+ *
+ * This service fetches organization data from a remote endpoint, compares it with the local database,
+ * and identifies added or modified elements. If changes are detected, it updates the database
+ * and triggers an email notification with a summary of the changes.
+ *
+ */
 @Service
 class OrganizationService(
     private val config: Config,
@@ -22,6 +30,16 @@ class OrganizationService(
 ) {
     private val logger = LoggerFactory.getLogger(OrganizationService::class.java)
 
+    /**
+     * Orchestrates the update process for organization elements.
+     *
+     * This method performs the following steps:
+     * 1. Retrieves all existing organization documents from the repository.
+     * 2. Fetches the latest updates from the configured REST endpoint.
+     * 3. Compares the fetched resources with existing documents to detect additions and modifications.
+     * 4. Persists the changes (new and updated documents) to the database.
+     * 5. If changes were found, compiles a report (including parent info) and sends it via email.
+     */
     fun update() {
         val addedOrganizationDocuments = mutableListOf<OrganizationDocument>()
         val updatedOrganizationDocuments = mutableListOf<OrganizationDocument>()
@@ -43,7 +61,7 @@ class OrganizationService(
             )
 
         updates?.let { it ->
-            logger.info("Found ${it.size} updates.")
+            logger.info("Found ${it.size} updates")
             // Go through each resource to check if it's new or modified.
             // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
             it.content.forEach { resource ->
@@ -90,7 +108,7 @@ class OrganizationService(
             return
         }
 
-        logger.info("Saving {} updates ...", updatedOrganizationDocuments.size)
+        logger.info("Saving {} updates", updatedOrganizationDocuments.size)
         organizationRepository.saveAll(updatedOrganizationDocuments)
 
         logger.info("Added: {} items", addedOrganizationDocuments.size)

@@ -1,9 +1,5 @@
 spring:
-  data:
-    mongodb:
-      database: org-monitor
-      uri: mongodb://mongodb:mongodb@localhost:27017
-
-fint:
-  orgmonitor:
-    cron: "*/20 * * * * *"
+  datasource:
+    url: jdbc:postgresql://localhost:5432/app
+    username: postgres
+    password: postgres

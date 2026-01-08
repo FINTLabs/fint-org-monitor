@@ -6,7 +6,6 @@ fint:
     application-name: Test
     recipients: asgeir@fintlabs.no
     sender: asgeir@fintlabs.no
-    endpoint: https://play-with-fint.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
     orgid: fintlabs.no
     cron: "*/30 * * * * *"
   core:
@@ -15,4 +14,13 @@ fint:
       password: 123
       client-id: 123
       client-secret: 123
-spring.data.mongodb.uri: mongodb://123
+  oauth:
+    enabled: false
+  sync:
+    enabled: false # make sure UpdateRunner do not run when testing.z
+
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
