@@ -69,38 +69,24 @@ class OrganizationService(
 
                 organizationMap[resourceId]?.let { existingDocument ->
                     // if current != null, the document exists in the database. So we have to check if it actually has been modified.
-                    createDocument(resource).let { modifiedDocument ->
-                        if (existingDocument != modifiedDocument) {
-                            // If modified, store modifications
-                            modifiedDocument.id = resourceId
-                            updatedOrganizationDocuments.add(modifiedDocument)
-                            updatedPairs.add(Pair(existingDocument, modifiedDocument))
-
-                            // Add parentId to parentIds list, if parent exists
-                            if (StringUtils.hasText(modifiedDocument.overordnet)) {
-                                organizationMap[modifiedDocument.overordnet]?.let { parentDocument ->
-                                    if (!parentIds.contains(parentDocument.id)) {
-                                        parentIds.add(parentDocument.id)
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    storeModifiedDocument(
+                        createDocument(resource),
+                        resourceId,
+                        updatedOrganizationDocuments,
+                        updatedPairs,
+                        existingDocument,
+                        organizationMap,
+                        parentIds,
+                    )
                 } ?: run {
                     // If current == null
-                    createDocument(resource).let { newDocument ->
-                        updatedOrganizationDocuments.add(newDocument)
-                        addedOrganizationDocuments.add(newDocument)
-
-                        // Add parent id to parentIds list, if parent exists
-                        if (StringUtils.hasText(newDocument.overordnet)) {
-                            organizationMap[newDocument.overordnet]?.let { parentDocument ->
-                                if (!parentIds.contains(parentDocument.id)) {
-                                    parentIds.add(parentDocument.id)
-                                }
-                            }
-                        }
-                    }
+                    storeNewDocument(
+                        createDocument(resource),
+                        updatedOrganizationDocuments,
+                        addedOrganizationDocuments,
+                        organizationMap,
+                        parentIds,
+                    )
                 }
             }
         } ?: run {
@@ -118,6 +104,49 @@ class OrganizationService(
         if (addedOrganizationDocuments.isNotEmpty() || updatedPairs.isNotEmpty()) {
             val parentInfo = if (parentIds.isEmpty()) mutableListOf() else createParentInfo(parentIds)
             mailingService.send(templateService.render(addedOrganizationDocuments, updatedPairs, parentInfo))
+        }
+    }
+
+    private fun storeModifiedDocument(
+        modifiedDocument: OrganizationDocument,
+        resourceId: String,
+        updatedOrganizationDocuments: MutableList<OrganizationDocument>,
+        updatedPairs: MutableList<Pair<OrganizationDocument, OrganizationDocument>>,
+        existingDocument: OrganizationDocument,
+        organizationMap: Map<String?, OrganizationDocument>,
+        parentIds: MutableList<String>,
+    ) {
+        modifiedDocument.id = resourceId
+        updatedOrganizationDocuments.add(modifiedDocument)
+        updatedPairs.add(Pair(existingDocument, modifiedDocument))
+
+        // Add parentId to parentIds list, if parent exists
+        if (StringUtils.hasText(modifiedDocument.overordnet)) {
+            organizationMap[modifiedDocument.overordnet]?.let { parentDocument ->
+                if (!parentIds.contains(parentDocument.id)) {
+                    parentIds.add(parentDocument.id)
+                }
+            }
+        }
+    }
+
+    private fun storeNewDocument(
+        newDocument: OrganizationDocument,
+        updatedOrganizationDocuments: MutableList<OrganizationDocument>,
+        addedOrganizationDocuments: MutableList<OrganizationDocument>,
+        organizationMap: Map<String?, OrganizationDocument>,
+        parentIds: MutableList<String>,
+    ) {
+        updatedOrganizationDocuments.add(newDocument)
+        addedOrganizationDocuments.add(newDocument)
+
+        // Add parent id to parentIds list, if parent exists
+        if (StringUtils.hasText(newDocument.overordnet)) {
+            organizationMap[newDocument.overordnet]?.let { parentDocument ->
+                if (!parentIds.contains(parentDocument.id)) {
+                    parentIds.add(parentDocument.id)
+                }
+            }
         }
     }
 
