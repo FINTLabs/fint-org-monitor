@@ -1,0 +1,64 @@
+{
+  "_embedded": {
+    "_entries": [
+      {
+        "navn": "Hovedkontor",
+        "kortnavn": "HK",
+        "organisasjonsId": {
+          "identifikatorverdi": "1001"
+        },
+        "organisasjonsKode": {
+          "identifikatorverdi": "ORG_1"
+        },
+        "organisasjonsnummer": {
+          "identifikatorverdi": "999999999"
+        },
+        "_links": {
+          "self": [
+            {
+              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+            }
+          ],
+          "overordnet": [
+            {
+              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1000"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "Avdeling A",
+        "kortnavn": "AVD_A",
+        "organisasjonsId": {
+          "identifikatorverdi": "1002"
+        },
+        "organisasjonsKode": {
+          "identifikatorverdi": "ORG_2"
+        },
+        "organisasjonsnummer": {
+          "identifikatorverdi": "888888888"
+        },
+        "_links": {
+          "self": [
+            {
+              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+            }
+          ],
+          "overordnet": [
+            {
+              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "total_items": 2,
+  "_links": {
+    "self": [
+      {
+        "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement"
+      }
+    ]
+  }
+}
