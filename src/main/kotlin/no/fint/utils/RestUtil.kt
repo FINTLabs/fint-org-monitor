@@ -59,7 +59,6 @@ class RestUtil(
                             .fromUriString(uri)
                             .pathSegment("last-updated")
                             .build()
-                            .also { println(it) }
                             .toUriString(),
                     )["lastUpdated"],
                 ) { "No lastUpdated value from $uri" }.toLong()
