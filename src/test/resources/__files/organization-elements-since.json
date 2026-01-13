@@ -13,15 +13,18 @@
         "organisasjonsnummer": {
           "identifikatorverdi": "999999999"
         },
+        "gyldighetsperiode": {
+          "start": "2019-04-01T00:00:00Z"
+        },
         "_links": {
           "self": [
             {
-              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
             }
           ],
           "overordnet": [
             {
-              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1000"
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1000"
             }
           ]
         }
@@ -32,6 +35,9 @@
         "organisasjonsId": {
           "identifikatorverdi": "1002"
         },
+        "gyldighetsperiode": {
+          "start": "2019-04-01T00:00:00Z"
+        },
         "organisasjonsKode": {
           "identifikatorverdi": "ORG_2"
         },
@@ -41,23 +47,56 @@
         "_links": {
           "self": [
             {
-              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
             }
           ],
           "overordnet": [
             {
-              "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+            }
+          ]
+        }
+      },
+      {
+        "navn": "VGKALN Kalnes videregående skole",
+        "kortnavn": "VGKALN",
+        "organisasjonsId": {
+          "identifikatorverdi": "762"
+        },
+        "gyldighetsperiode": {
+          "start": "2019-04-01T00:00:00Z"
+        },
+        "organisasjonsKode": {
+          "identifikatorverdi": "ORG_2"
+        },
+        "organisasjonsnummer": {
+          "identifikatorverdi": "888888888"
+        },
+        "_links": {
+          "self": [
+            {
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+            }
+          ],
+          "overordnet": [
+            {
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+            }
+          ],
+          "underordnet": [
+            {
+              "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1003"
             }
           ]
         }
       }
     ]
   },
-  "total_items": 2,
+  "total_items": 3,
   "_links": {
     "self": [
       {
-        "href": "https://api.fintlabs.no/administrasjon/organisasjon/organisasjonselement"
+        "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement"
       }
     ]
   }

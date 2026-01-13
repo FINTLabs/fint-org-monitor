@@ -47,8 +47,8 @@ class OrganizationService(
         val parentIds = mutableListOf<String>()
 
         // Get all documents by orgid
-        val documents = organizationRepository.getAllByOrgId(config.orgid) // TODO: update to get only the document i want from database, instead of every?
-        logger.info("Repository contains ${documents.size} documents.")
+        val documents = organizationRepository.getAllByOrgId(config.orgid)
+        logger.info("Repository contains ${documents.size} documents for ${config.orgid}.")
 
         // Create map to lookup documents by the organizations id
         val organizationMap = documents.associateBy { it.data?.organisasjonsId?.identifikatorverdi }
@@ -66,18 +66,22 @@ class OrganizationService(
             // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
             it.content.forEach { resource ->
                 val resourceId = resource.organisasjonsId.identifikatorverdi
+                val newDocument = createDocument(resource)
 
                 organizationMap[resourceId]?.let { existingDocument ->
-                    // if current != null, the document exists in the database. So we have to check if it actually has been modified.
-                    storeModifiedDocument(
-                        createDocument(resource),
-                        resourceId,
-                        updatedOrganizationDocuments,
-                        updatedPairs,
-                        existingDocument,
-                        organizationMap,
-                        parentIds,
-                    )
+                    // if the document exists in the database, we have to check if it actually has been modified.
+                    if (!existingDocument.isEqual(newDocument)) {
+                        // ... and store it if it has been modified
+                        storeModifiedDocument(
+                            newDocument,
+                            resourceId,
+                            updatedOrganizationDocuments,
+                            updatedPairs,
+                            existingDocument,
+                            organizationMap,
+                            parentIds,
+                        )
+                    }
                 } ?: run {
                     // If current == null
                     storeNewDocument(
@@ -107,6 +111,10 @@ class OrganizationService(
         }
     }
 
+    // Custom equality check for OrganizationDocument to check underordnet and overordnet
+    private fun OrganizationDocument.isEqual(other: OrganizationDocument): Boolean =
+        this == other || this.underordnet == other.underordnet || this.overordnet == other.overordnet
+
     private fun storeModifiedDocument(
         modifiedDocument: OrganizationDocument,
         resourceId: String,
@@ -118,7 +126,14 @@ class OrganizationService(
     ) {
         modifiedDocument.id = resourceId
         updatedOrganizationDocuments.add(modifiedDocument)
-        updatedPairs.add(Pair(existingDocument, modifiedDocument))
+        // A little ugly, but necessary to avoid existingDocument being modified after it is added to updatedPairs
+        // The pointer to underordnet is also copied as the its only a pointer.
+        updatedPairs.add(
+            Pair(
+                existingDocument.copy(underordnet = existingDocument.underordnet?.toList()),
+                modifiedDocument,
+            ),
+        )
 
         // Add parentId to parentIds list, if parent exists
         if (StringUtils.hasText(modifiedDocument.overordnet)) {

@@ -38,7 +38,7 @@ class RestUtil(
         uri: String,
     ): T =
         lastUpdatedMap.getOrDefault(uri, 0L).let { since ->
-            logger.info("Fetching $uri since $since")
+            logger.info("Fetching since $since")
             // get all OrganisasjonsElement that was updated since timestamp `since`
             val result =
                 get(
