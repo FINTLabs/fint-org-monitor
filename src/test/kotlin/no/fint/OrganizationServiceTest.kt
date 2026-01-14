@@ -1,5 +1,8 @@
 package no.fint
 
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.okJson
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import no.fint.mailing.MailingService
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
@@ -7,24 +10,16 @@ import no.fint.model.felles.kompleksedatatyper.Periode
 import no.fint.organization.OrganizationDocument
 import no.fint.organization.OrganizationRepository
 import no.fint.organization.OrganizationService
-import no.fint.utils.RestUtil
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.DynamicPropertyRegistry
-import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.transaction.annotation.Transactional
-import org.testcontainers.containers.PostgreSQLContainer
-import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
-import org.wiremock.spring.ConfigureWireMock
-import org.wiremock.spring.EnableWireMock
 import java.util.Date
 
 @SpringBootTest
@@ -74,7 +69,23 @@ class OrganizationServiceTest(
     @Test
     @Transactional
     fun `should not do anything when there is no update`() {
-        // TODO: create stub that returns no updates
+        // Override WireMock mappings to return an empty list (no updates)
+        wireMockServer.stubFor(
+            get(urlEqualTo("/administrasjon/organisasjon/organisasjonselement?sinceTimeStamp=0"))
+                .willReturn(
+                    okJson(
+                        """
+                        {
+                          "_embedded": {
+                            "_entries": []
+                          },
+                          "total_items": 0,
+                          "content": []
+                        }
+                        """.trimIndent(),
+                    ),
+                ),
+        ) // TODO: create stub that returns no updates
 
         organizationService.update()
         // assert nothing has changed in database
