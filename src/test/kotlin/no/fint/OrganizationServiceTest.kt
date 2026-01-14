@@ -10,9 +10,13 @@ import no.fint.model.felles.kompleksedatatyper.Periode
 import no.fint.organization.OrganizationDocument
 import no.fint.organization.OrganizationRepository
 import no.fint.organization.OrganizationService
+import no.fint.utils.TemplateService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers.any
+import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -33,9 +37,13 @@ class OrganizationServiceTest(
     @MockitoBean
     private lateinit var mailingService: MailingService
 
+    @MockitoBean
+    private lateinit var templateService: TemplateService
+
     @BeforeEach
     fun setUp() {
         `when`(mailingService.send(anyString())).thenReturn(true)
+        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
         val organisasjonselement =
             Organisasjonselement().apply {
                 organisasjonsId = Identifikator().apply { identifikatorverdi = "762" }
@@ -94,13 +102,9 @@ class OrganizationServiceTest(
     }
 
     @Test
-    fun `should create report when there is one update`() {
-        assert(true)
-    }
-
-    @Test
-    fun `should create report when there is several updates`() {
-        assert(true)
+    fun `should create report when there is an update`() {
+        organizationService.update()
+        verify(templateService).render(anyList(), anyList(), anyList())
     }
 
     @Test
