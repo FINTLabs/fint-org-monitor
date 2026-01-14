@@ -1,8 +1,10 @@
 package no.fint
 
 import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.matching
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import no.fint.mailing.MailingService
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.fint.model.felles.kompleksedatatyper.Identifikator
@@ -13,7 +15,6 @@ import no.fint.organization.OrganizationService
 import no.fint.utils.TemplateService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
@@ -42,8 +43,10 @@ class OrganizationServiceTest(
 
     @BeforeEach
     fun setUp() {
+        // Mock mailingservice
         `when`(mailingService.send(anyString())).thenReturn(true)
-        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
+
+        // Save one entry to the test database
         val organisasjonselement =
             Organisasjonselement().apply {
                 organisasjonsId = Identifikator().apply { identifikatorverdi = "762" }
@@ -75,11 +78,11 @@ class OrganizationServiceTest(
     }
 
     @Test
-    @Transactional
     fun `should not do anything when there is no update`() {
         // Override WireMock mappings to return an empty list (no updates)
         wireMockServer.stubFor(
-            get(urlEqualTo("/administrasjon/organisasjon/organisasjonselement?sinceTimeStamp=0"))
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
@@ -93,7 +96,7 @@ class OrganizationServiceTest(
                         """.trimIndent(),
                     ),
                 ),
-        ) // TODO: create stub that returns no updates
+        )
 
         organizationService.update()
         // assert nothing has changed in database
@@ -103,13 +106,8 @@ class OrganizationServiceTest(
 
     @Test
     fun `should create report when there is an update`() {
+        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
         organizationService.update()
         verify(templateService).render(anyList(), anyList(), anyList())
-    }
-
-    @Test
-    fun `should only contain updates about their own orgId`() {
-        // Should not be any updates about changes for other orgIds
-        // consumer should not return updates for other orgIds?
     }
 }

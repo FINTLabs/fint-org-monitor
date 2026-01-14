@@ -60,42 +60,42 @@ class OrganizationService(
                 config.endpoint,
             )
 
-        updates?.let { it ->
-            logger.info("Found ${it.size} updates")
-            // Go through each resource to check if it's new or modified.
-            // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
-            it.content.forEach { resource ->
-                val resourceId = resource.organisasjonsId.identifikatorverdi
-                val newDocument = createDocument(resource)
+        if (updates == null) {
+            logger.error("Failed to fetch updates from endpoint: ${config.endpoint}")
+            return
+        }
 
-                organizationMap[resourceId]?.let { existingDocument ->
-                    // if the document exists in the database, we have to check if it actually has been modified.
-                    if (!existingDocument.isEqual(newDocument)) {
-                        // ... and store it if it has been modified
-                        storeModifiedDocument(
-                            newDocument,
-                            resourceId,
-                            updatedOrganizationDocuments,
-                            updatedPairs,
-                            existingDocument,
-                            organizationMap,
-                            parentIds,
-                        )
-                    }
-                } ?: run {
-                    // If current == null
-                    storeNewDocument(
-                        createDocument(resource),
+        logger.info("Found ${updates.size} updates")
+        // Go through each resource to check if it's new or modified.
+        // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
+        updates.content.forEach { resource ->
+            val resourceId = resource.organisasjonsId.identifikatorverdi
+            val newDocument = createDocument(resource)
+
+            organizationMap[resourceId]?.let { existingDocument ->
+                // if the document exists in the database, we have to check if it actually has been modified.
+                if (!existingDocument.isEqual(newDocument)) {
+                    // ... and store it if it has been modified
+                    storeModifiedDocument(
+                        newDocument,
+                        resourceId,
                         updatedOrganizationDocuments,
-                        addedOrganizationDocuments,
+                        updatedPairs,
+                        existingDocument,
                         organizationMap,
                         parentIds,
                     )
                 }
+            } ?: run {
+                // If current == null
+                storeNewDocument(
+                    createDocument(resource),
+                    updatedOrganizationDocuments,
+                    addedOrganizationDocuments,
+                    organizationMap,
+                    parentIds,
+                )
             }
-        } ?: run {
-            logger.error("Failed to fetch updates from endpoint: ${config.endpoint}")
-            return
         }
 
         logger.info("Saving {} updates", updatedOrganizationDocuments.size)
