@@ -3,7 +3,6 @@ package no.fint
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.matching
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
-import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import no.fint.mailing.MailingService
 import no.fint.model.administrasjon.organisasjon.Organisasjonselement
@@ -17,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
@@ -99,6 +99,7 @@ class OrganizationServiceTest(
         )
 
         organizationService.update()
+
         // assert nothing has changed in database
         val orgs = organizationRepository.findAll()
         assert(orgs.size == 1)
@@ -106,8 +107,182 @@ class OrganizationServiceTest(
 
     @Test
     fun `should create report when there is an update`() {
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .withQueryParam("sinceTimeStamp", matching("\\d+"))
+                .willReturn(
+                    okJson(
+                        """
+                        {
+                          "_embedded": {
+                            "_entries": [
+                              {
+                                "navn": "Hovedkontor",
+                                "kortnavn": "HK",
+                                "organisasjonsId": {
+                                  "identifikatorverdi": "1001"
+                                },
+                                "organisasjonsKode": {
+                                  "identifikatorverdi": "ORG_1"
+                                },
+                                "organisasjonsnummer": {
+                                  "identifikatorverdi": "999999999"
+                                },
+                                "gyldighetsperiode": {
+                                  "start": "2019-04-01T00:00:00Z"
+                                },
+                                "_links": {
+                                  "self": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+                                    }
+                                  ],
+                                  "overordnet": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1000"
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "navn": "Avdeling A",
+                                "kortnavn": "AVD_A",
+                                "organisasjonsId": {
+                                  "identifikatorverdi": "1002"
+                                },
+                                "gyldighetsperiode": {
+                                  "start": "2019-04-01T00:00:00Z"
+                                },
+                                "organisasjonsKode": {
+                                  "identifikatorverdi": "ORG_2"
+                                },
+                                "organisasjonsnummer": {
+                                  "identifikatorverdi": "888888888"
+                                },
+                                "_links": {
+                                  "self": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+                                    }
+                                  ],
+                                  "overordnet": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "navn": "VGKALN Kalnes videregående skole",
+                                "kortnavn": "VGKALN",
+                                "organisasjonsId": {
+                                  "identifikatorverdi": "762"
+                                },
+                                "gyldighetsperiode": {
+                                  "start": "2019-04-01T00:00:00Z"
+                                },
+                                "organisasjonsKode": {
+                                  "identifikatorverdi": "ORG_2"
+                                },
+                                "organisasjonsnummer": {
+                                  "identifikatorverdi": "888888888"
+                                },
+                                "_links": {
+                                  "self": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+                                    }
+                                  ],
+                                  "overordnet": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+                                    }
+                                  ],
+                                  "underordnet": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1003"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "total_items": 3,
+                          "_links": {
+                            "self": [
+                              {
+                                "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement"
+                              }
+                            ]
+                          }
+                        }
+                        """.trimIndent(),
+                    ),
+                ),
+        )
         `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
         organizationService.update()
         verify(templateService).render(anyList(), anyList(), anyList())
+    }
+
+    @Test
+    fun `should not do anything when the order of underordnet changes`() {
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .withQueryParam("sinceTimeStamp", matching("\\d+"))
+                .willReturn(
+                    okJson(
+                        """
+                        {
+                          "_embedded": {
+                            "_entries": [
+                              {
+                                "organisasjonsId": {
+                                  "identifikatorverdi": "762"
+                                },
+                                "organisasjonsKode": {
+                                  "identifikatorverdi": "V40.44.17"
+                                },
+                                "organisasjonsnummer": {
+                                  "identifikatorverdi": "974544520"
+                                },
+                                "navn": "VGKALN Kalnes videregående skole",
+                                "kortnavn": "VGKALN",
+                                "gyldighetsperiode": {
+                                  "start": "2019-04-01T00:00:00Z"
+                                },
+                                "_links": {
+                                  "overordnet": [
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/156"
+                                    }
+                                  ],
+                                  "underordnet": [
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/775"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/763"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/770"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/766"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          },
+                          "total_items": 1
+                        }
+                        """.trimIndent(),
+                    ),
+                ),
+        )
+
+        organizationService.update()
+        verify(mailingService, never()).send(anyString())
     }
 }

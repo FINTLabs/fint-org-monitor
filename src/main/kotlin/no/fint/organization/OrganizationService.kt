@@ -28,7 +28,7 @@ class OrganizationService(
     private val mailingService: MailingService,
     private val templateService: TemplateService,
 ) {
-    private val logger = LoggerFactory.getLogger(OrganizationService::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * Orchestrates the update process for organization elements.
@@ -66,6 +66,10 @@ class OrganizationService(
         }
 
         logger.info("Found ${updates.size} updates")
+        logger.trace(
+            "Updates content: {}",
+            updates.content.joinToString(", ") { "ID=${it.organisasjonsId.identifikatorverdi}, Name=${it.navn}" },
+        )
         // Go through each resource to check if it's new or modified.
         // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
         updates.content.forEach { resource ->
@@ -74,7 +78,7 @@ class OrganizationService(
 
             organizationMap[resourceId]?.let { existingDocument ->
                 // if the document exists in the database, we have to check if it actually has been modified.
-                if (!existingDocument.isEqual(newDocument)) {
+                if (existingDocument != newDocument) {
                     // ... and store it if it has been modified
                     storeModifiedDocument(
                         newDocument,
@@ -111,10 +115,6 @@ class OrganizationService(
         }
     }
 
-    // Custom equality check for OrganizationDocument to check underordnet and overordnet
-    private fun OrganizationDocument.isEqual(other: OrganizationDocument): Boolean =
-        this == other || this.underordnet == other.underordnet || this.overordnet == other.overordnet
-
     private fun storeModifiedDocument(
         modifiedDocument: OrganizationDocument,
         resourceId: String,
@@ -126,6 +126,7 @@ class OrganizationService(
     ) {
         modifiedDocument.id = resourceId
         updatedOrganizationDocuments.add(modifiedDocument)
+
         // A little ugly, but necessary to avoid existingDocument being modified after it is added to updatedPairs
         // The pointer to underordnet is also copied as the its only a pointer.
         updatedPairs.add(

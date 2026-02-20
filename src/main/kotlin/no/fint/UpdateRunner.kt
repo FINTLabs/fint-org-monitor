@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 @Component
 @ConditionalOnProperty(value = ["fint.sync.enabled"], havingValue = "true", matchIfMissing = true)
 class UpdateRunner : ApplicationRunner {
-    private val logger = LoggerFactory.getLogger(UpdateRunner::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     private lateinit var organizationService: OrganizationService

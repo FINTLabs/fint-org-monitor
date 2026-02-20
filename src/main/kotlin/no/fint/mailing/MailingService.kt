@@ -11,7 +11,7 @@ import javax.mail.internet.MimeMessage
 class MailingService(
     private val config: Config,
 ) {
-    private val logger = LoggerFactory.getLogger(MailingService::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     fun send(content: String): Boolean {
         logger.info("Sending email from ${config.sender} to ${config.recipients}")

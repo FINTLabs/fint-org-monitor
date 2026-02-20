@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListMap
+import kotlin.text.clear
 
 /**
  * Utility class for performing REST operations and tracking last updated timestamps per URI.
@@ -22,7 +23,7 @@ class RestUtil(
     private val restTemplate: RestTemplate = restTemplateBuilder.build()
     private val lastUpdatedMap: ConcurrentMap<String, Long> = ConcurrentSkipListMap()
 
-    private val logger = LoggerFactory.getLogger(RestUtil::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * Fetches updates from the given URI since the last known update timestamp.
