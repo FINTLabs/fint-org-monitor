@@ -9,17 +9,17 @@ fint:
     orgid: ${fint.org-id}
     cron: '0 15 8-14/2 * * *'
     interval: 3600000
-    smtpUsername: dummy
-    smtpPassword: dummy
-    smtpServer: dummy
+    smtpUsername: 
+    smtpPassword: 
+    smtpServer: 
     smtpHost: outlook.office365.com
     smtpPort: 587
   oauth:
     access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
-    username: dummy
-    password: dummy
-    client-id: dummy
-    client-secret: dummy
+    username: 
+    password: 
+    client-id: 
+    client-secret: 
     enabled: true
     scope: fint-client
 
