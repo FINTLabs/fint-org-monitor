@@ -1,13 +1,12 @@
 services:
-  postgres:
-    image: postgres:18
-    container_name: org_mon_postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
     ports:
-      - "5432:5432"
-    restart: unless-stopped
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongodb
+      MONGO_INITDB_ROOT_PASSWORD: mongodb
 
 networks:
   network-bridge:

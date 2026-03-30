@@ -1,5 +1,25 @@
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/app
-    username: postgres
-    password: postgres
+fint:
+  database:
+    url: mongodb://mongodb:mongodb@localhost:27017/app?authSource=admin
+  environment: alpha
+  orgmonitor:
+    application-name: FINT Organization Monitor
+    recipients:
+    endpoint: https://${fint.environment}.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
+    orgid: ${fint.org-id}
+    cron: '0 15 8-14/2 * * *'
+    interval: 3600000
+    smtpUsername: dummy
+    smtpPassword: dummy
+    smtpServer: dummy
+    smtpHost: outlook.office365.com
+    smtpPort: 587
+  oauth:
+    access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
+    username: dummy
+    password: dummy
+    client-id: dummy
+    client-secret: dummy
+    enabled: true
+    scope: fint-client
+

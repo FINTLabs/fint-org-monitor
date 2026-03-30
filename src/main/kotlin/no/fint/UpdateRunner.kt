@@ -8,6 +8,9 @@ import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 
+/*
+ * This class is needed to run as a FlaisJob
+ */
 @Component
 @ConditionalOnProperty(value = ["fint.sync.enabled"], havingValue = "true", matchIfMissing = true)
 class UpdateRunner : ApplicationRunner {

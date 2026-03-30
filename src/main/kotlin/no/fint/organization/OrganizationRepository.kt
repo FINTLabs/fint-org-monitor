@@ -1,10 +1,10 @@
 package no.fint.organization
 
-import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface OrganizationRepository : JpaRepository<OrganizationDocument, String> {
+interface OrganizationRepository : MongoRepository<OrganizationDocument, String> {
     fun getAllByOrgId(orgId: String): List<OrganizationDocument>
 
     fun getOrganizationDocumentByIdAndOrgId(

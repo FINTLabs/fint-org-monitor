@@ -12,6 +12,7 @@ import no.fint.organization.OrganizationDocument
 import no.fint.organization.OrganizationRepository
 import no.fint.organization.OrganizationService
 import no.fint.utils.TemplateService
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.anyList
@@ -23,23 +24,26 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.transaction.annotation.Transactional
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.util.Date
 
 @SpringBootTest
 @Testcontainers
 @ActiveProfiles("test")
-@Transactional // To reset database before each test.
 class OrganizationServiceTest(
-    @Autowired private val organizationRepository: OrganizationRepository,
-    @Autowired private val organizationService: OrganizationService,
+    @param:Autowired private val organizationRepository: OrganizationRepository,
+    @param:Autowired private val organizationService: OrganizationService,
 ) : BaseIntegrationTest() {
     @MockitoBean
     private lateinit var mailingService: MailingService
 
     @MockitoBean
     private lateinit var templateService: TemplateService
+
+    @AfterEach
+    fun cleanup() {
+        organizationRepository.deleteAll()
+    }
 
     @BeforeEach
     fun setUp() {
