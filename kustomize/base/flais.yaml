@@ -14,7 +14,7 @@ metadata:
 spec:
   port: 8080
   orgId: fintlabs.no
-  image: ghcr.io/fintlabs/fint-org-monitor:latest
+  image: ghcr.io/fintlabs/fint-org-monitor:sha-00000
   imagePullPolicy: Always
   prometheus:
     enabled: true
