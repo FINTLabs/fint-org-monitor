@@ -1,5 +1,7 @@
 # Lets user manually trigger a deployment to a selected cluster
 name: manual-deployment
+permissions:
+  contents: read
 on:
   workflow_dispatch:
     inputs:
