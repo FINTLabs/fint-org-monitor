@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      contents: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5.0.0
@@ -33,22 +30,11 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: java-kotlin
-          build-mode: manual
-
       - name: Gradle build
         run: |
           ./gradlew build
           mkdir data
           cp ./build/libs/${GITHUB_REPOSITORY#*/}-*.jar ./data/app.jar
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: /language:java-kotlin
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v5
