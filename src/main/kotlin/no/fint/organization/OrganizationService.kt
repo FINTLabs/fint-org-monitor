@@ -57,11 +57,10 @@ class OrganizationService(
         val updates =
             restUtil.getUpdates(
                 object : ParameterizedTypeReference<OrganisasjonselementResources?>() {},
-                config.endpoint,
             )
 
         if (updates == null) {
-            logger.error("Failed to fetch updates from endpoint: ${config.endpoint}")
+            logger.error("Failed to fetch updates from endpoint")
             return
         }
 

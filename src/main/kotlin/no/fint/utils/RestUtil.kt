@@ -1,5 +1,6 @@
 package no.fint.utils
 
+import no.fint.Config
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference
@@ -19,6 +20,7 @@ import kotlin.text.clear
 @Component
 class RestUtil(
     restTemplateBuilder: RestTemplateBuilder,
+    private val config: Config,
 ) {
     private val restTemplate: RestTemplate = restTemplateBuilder.build()
     private val lastUpdatedMap: ConcurrentMap<String, Long> = ConcurrentSkipListMap()
@@ -26,26 +28,22 @@ class RestUtil(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
-     * Fetches updates from the given URI since the last known update timestamp.
+     * Fetches updates from the URI set in endpoint config since the last known update timestamp.
      * Updates the internal lastUpdatedMap with the latest timestamp.
      *
      * @param type the type reference for the response body
-     * @param uri the endpoint URI
      * @return the response body of type T
      * @throws IllegalArgumentException if the response body or lastUpdated value is missing
      */
-    fun <T> getUpdates(
-        type: ParameterizedTypeReference<T>,
-        uri: String,
-    ): T =
-        lastUpdatedMap.getOrDefault(uri, 0L).let { since ->
+    fun <T> getUpdates(type: ParameterizedTypeReference<T>): T =
+        lastUpdatedMap.getOrDefault(config.endpoint, 0L).let { since ->
             logger.info("Fetching since $since")
             // get all OrganisasjonsElement that was updated since timestamp `since`
             val result =
                 get(
                     type,
                     UriComponentsBuilder
-                        .fromUriString(uri)
+                        .fromUriString(config.endpoint)
                         .queryParam("sinceTimeStamp", since)
                         .build()
                         .toUriString(),
@@ -57,13 +55,13 @@ class RestUtil(
                         // ParameterizedTypeReference is used to get the generic data without an explicit type.
                         object : ParameterizedTypeReference<MutableMap<String, String>>() {},
                         UriComponentsBuilder
-                            .fromUriString(uri)
+                            .fromUriString(config.endpoint)
                             .pathSegment("last-updated")
                             .build()
                             .toUriString(),
                     )["lastUpdated"],
-                ) { "No lastUpdated value from $uri" }.toLong()
-            lastUpdatedMap[uri] = lastUpdated
+                ) { "No lastUpdated value from ${config.endpoint}" }.toLong()
+            lastUpdatedMap[config.endpoint] = lastUpdated
             result
         }
 
