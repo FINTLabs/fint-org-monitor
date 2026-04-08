@@ -30,6 +30,15 @@ class OrganizationService(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    private data class UpdateChanges(
+        val addedDocuments: MutableList<OrganizationDocument> = mutableListOf(),
+        val documentsToSave: MutableList<OrganizationDocument> = mutableListOf(),
+        val updatedPairs: MutableList<Pair<OrganizationDocument, OrganizationDocument>> = mutableListOf(),
+        val parentIds: MutableSet<String> = linkedSetOf(),
+    ) {
+        fun hasChanges(): Boolean = addedDocuments.isNotEmpty() || updatedPairs.isNotEmpty()
+    }
+
     /**
      * Orchestrates the update process for organization elements.
      *
@@ -41,19 +50,27 @@ class OrganizationService(
      * 5. If changes were found, compiles a report (including parent info) and sends it via email.
      */
     fun update() {
-        val addedOrganizationDocuments = mutableListOf<OrganizationDocument>()
-        val updatedOrganizationDocuments = mutableListOf<OrganizationDocument>()
-        val updatedPairs = mutableListOf<Pair<OrganizationDocument, OrganizationDocument>>() // Old and New value for comparison
-        val parentIds = mutableListOf<String>()
-
-        // Get all documents by orgid
         val documents = organizationRepository.getAllByOrgId(config.orgid)
         logger.info("Repository contains ${documents.size} documents for ${config.orgid}.")
-
-        // Create map to lookup documents by the organizations id
         val organizationMap = documents.associateBy { it.data?.organisasjonsId?.identifikatorverdi }
 
-        // Get updates from endpoint
+        val updates = fetchUpdates() ?: return
+        logger.info("Found ${updates.size} updates")
+        logger.trace(
+            "Updates content: {}",
+            updates.content.joinToString(", ") { "ID=${it.organisasjonsId.identifikatorverdi}, Name=${it.navn}" },
+        )
+        val changes = collectChanges(updates.content, organizationMap)
+
+        logger.info("Saving {} updates", changes.documentsToSave.size)
+        organizationRepository.saveAll(changes.documentsToSave)
+        logger.info("Added: {} items", changes.addedDocuments.size)
+        logger.info("Updated: {} items", changes.updatedPairs.size)
+
+        sendNotification(changes)
+    }
+
+    private fun fetchUpdates(): OrganisasjonselementResources? {
         val updates =
             restUtil.getUpdates(
                 object : ParameterizedTypeReference<OrganisasjonselementResources?>() {},
@@ -61,108 +78,85 @@ class OrganizationService(
 
         if (updates == null) {
             logger.error("Failed to fetch updates from endpoint")
-            return
         }
 
-        logger.info("Found ${updates.size} updates")
-        logger.trace(
-            "Updates content: {}",
-            updates.content.joinToString(", ") { "ID=${it.organisasjonsId.identifikatorverdi}, Name=${it.navn}" },
-        )
-        // Go through each resource to check if it's new or modified.
-        // If it is modified, construct and save the necessary objects to be able to create a report showing the differences.
-        updates.content.forEach { resource ->
+        return updates
+    }
+
+    private fun collectChanges(
+        resources: List<OrganisasjonselementResource>,
+        organizationMap: Map<String?, OrganizationDocument>,
+    ): UpdateChanges {
+        val changes = UpdateChanges()
+
+        resources.forEach { resource ->
             val resourceId = resource.organisasjonsId.identifikatorverdi
             val newDocument = createDocument(resource)
+            val existingDocument = organizationMap[resourceId]
 
-            organizationMap[resourceId]?.let { existingDocument ->
-                // if the document exists in the database, we have to check if it actually has been modified.
-                if (existingDocument != newDocument) {
-                    // ... and store it if it has been modified
-                    storeModifiedDocument(
-                        newDocument,
-                        resourceId,
-                        updatedOrganizationDocuments,
-                        updatedPairs,
-                        existingDocument,
-                        organizationMap,
-                        parentIds,
-                    )
-                }
-            } ?: run {
-                // If current == null
-                storeNewDocument(
-                    createDocument(resource),
-                    updatedOrganizationDocuments,
-                    addedOrganizationDocuments,
-                    organizationMap,
-                    parentIds,
-                )
+            if (existingDocument == null) { // New document
+                storeNewDocument(newDocument, changes, organizationMap)
+            } else if (existingDocument != newDocument) { // Changed document
+                storeModifiedDocument(newDocument, resourceId, existingDocument, changes, organizationMap)
             }
+            // If none of the above, then we do nothing as there is no change.
         }
 
-        logger.info("Saving {} updates", updatedOrganizationDocuments.size)
-        organizationRepository.saveAll(updatedOrganizationDocuments)
-
-        logger.info("Added: {} items", addedOrganizationDocuments.size)
-
-        logger.info("Updated: {} items", updatedPairs.size)
-
-        if (addedOrganizationDocuments.isNotEmpty() || updatedPairs.isNotEmpty()) {
-            val parentInfo = if (parentIds.isEmpty()) mutableListOf() else createParentInfo(parentIds)
-            mailingService.send(templateService.render(addedOrganizationDocuments, updatedPairs, parentInfo))
-        }
+        return changes
     }
 
     private fun storeModifiedDocument(
         modifiedDocument: OrganizationDocument,
         resourceId: String,
-        updatedOrganizationDocuments: MutableList<OrganizationDocument>,
-        updatedPairs: MutableList<Pair<OrganizationDocument, OrganizationDocument>>,
         existingDocument: OrganizationDocument,
+        changes: UpdateChanges,
         organizationMap: Map<String?, OrganizationDocument>,
-        parentIds: MutableList<String>,
     ) {
         modifiedDocument.id = resourceId
-        updatedOrganizationDocuments.add(modifiedDocument)
+        changes.documentsToSave.add(modifiedDocument)
 
-        // A little ugly, but necessary to avoid existingDocument being modified after it is added to updatedPairs
-        // The pointer to underordnet is also copied as the its only a pointer.
-        updatedPairs.add(
+        // A little ugly to use .copy(), but necessary to avoid existingDocument being modified after it is added to updatedPairs
+        // The pointer to underordnet is copied.
+        changes.updatedPairs.add(
             Pair(
                 existingDocument.copy(underordnet = existingDocument.underordnet?.toList()),
                 modifiedDocument,
             ),
         )
 
-        // Add parentId to parentIds list, if parent exists
-        if (StringUtils.hasText(modifiedDocument.overordnet)) {
-            organizationMap[modifiedDocument.overordnet]?.let { parentDocument ->
-                if (!parentIds.contains(parentDocument.id)) {
-                    parentIds.add(parentDocument.id)
-                }
-            }
-        }
+        registerParentId(modifiedDocument.overordnet, organizationMap, changes)
     }
 
     private fun storeNewDocument(
         newDocument: OrganizationDocument,
-        updatedOrganizationDocuments: MutableList<OrganizationDocument>,
-        addedOrganizationDocuments: MutableList<OrganizationDocument>,
+        changes: UpdateChanges,
         organizationMap: Map<String?, OrganizationDocument>,
-        parentIds: MutableList<String>,
     ) {
-        updatedOrganizationDocuments.add(newDocument)
-        addedOrganizationDocuments.add(newDocument)
+        changes.documentsToSave.add(newDocument)
+        changes.addedDocuments.add(newDocument)
 
-        // Add parent id to parentIds list, if parent exists
-        if (StringUtils.hasText(newDocument.overordnet)) {
-            organizationMap[newDocument.overordnet]?.let { parentDocument ->
-                if (!parentIds.contains(parentDocument.id)) {
-                    parentIds.add(parentDocument.id)
-                }
-            }
+        registerParentId(newDocument.overordnet, organizationMap, changes)
+    }
+
+    private fun registerParentId(
+        parentHref: String?,
+        organizationMap: Map<String?, OrganizationDocument>,
+        changes: UpdateChanges,
+    ) {
+        if (!StringUtils.hasText(parentHref)) {
+            return
         }
+
+        organizationMap[parentHref]?.id?.let(changes.parentIds::add)
+    }
+
+    private fun sendNotification(changes: UpdateChanges) {
+        if (!changes.hasChanges()) {
+            return
+        }
+
+        val parentInfo = createParentInfo(changes.parentIds.toList())
+        mailingService.send(templateService.render(changes.addedDocuments, changes.updatedPairs, parentInfo))
     }
 
     private fun createDocument(resource: OrganisasjonselementResource) =
