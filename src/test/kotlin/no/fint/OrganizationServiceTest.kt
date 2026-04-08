@@ -5,13 +5,13 @@ import com.github.tomakehurst.wiremock.client.WireMock.matching
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import no.fint.mailing.MailingService
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement
-import no.fint.model.felles.kompleksedatatyper.Identifikator
-import no.fint.model.felles.kompleksedatatyper.Periode
 import no.fint.organization.OrganizationDocument
 import no.fint.organization.OrganizationRepository
 import no.fint.organization.OrganizationService
 import no.fint.utils.TemplateService
+import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
+import no.novari.fint.model.felles.kompleksedatatyper.Periode
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

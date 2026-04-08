@@ -2,11 +2,11 @@ package no.fint.organization
 
 import no.fint.Config
 import no.fint.mailing.MailingService
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import no.fint.utils.ResourceConverter
 import no.fint.utils.RestUtil
 import no.fint.utils.TemplateService
+import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
+import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service

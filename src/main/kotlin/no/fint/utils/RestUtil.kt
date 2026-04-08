@@ -23,6 +23,8 @@ class RestUtil(
     private val config: Config,
 ) {
     private val restTemplate: RestTemplate = restTemplateBuilder.build()
+
+    // TODO: this will not persist between runs of FlaisJob. Needs to be persisted in database
     private val lastUpdatedMap: ConcurrentMap<String, Long> = ConcurrentSkipListMap()
 
     private val logger = LoggerFactory.getLogger(javaClass)

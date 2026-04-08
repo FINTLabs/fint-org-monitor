@@ -2,8 +2,8 @@ package no.fint.utils
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement
-import no.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
+import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
+import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 
 object ResourceConverter {
     private val objectMapper =

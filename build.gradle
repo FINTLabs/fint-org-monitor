@@ -40,8 +40,8 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'com.sun.mail:javax.mail:1.6.2'
 
-    implementation("no.fint:fint-administrasjon-model-java:${apiVersion}")
-    implementation("no.fint:fint-administrasjon-resource-model-java:${apiVersion}")
+    implementation("no.novari:fint-administrasjon-model-java:${apiVersion}")
+    implementation("no.novari:fint-administrasjon-resource-model-java:${apiVersion}")
     implementation('no.fint:fint-oauth-token-service:1.6.1')
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'

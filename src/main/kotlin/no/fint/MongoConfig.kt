@@ -2,7 +2,7 @@ package no.fint
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
-import no.fint.model.administrasjon.organisasjon.Organisasjonselement
+import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
 import org.bson.Document
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
