@@ -14,29 +14,34 @@ labels:
       fintlabs.no/org-id: bfk.no
 patches:
   - patch: |-
-      - op: replace
-        path: "/spec/env/0/value"
-        value: "api"
-      - op: replace
-        path: "/spec/env/2/value"
-        value: "integrasjoner.elements@bfk.no, olegia@bfk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no"
-      - op: replace
-        path: "/metadata/labels/app.kubernetes.io~1instance"
-        value: "fint-org-monitor_bfk_no"
-      - op: replace
-        path: "/spec/orgId"
-        value: "bfk.no"
+      apiVersion: fintlabs.no/v1alpha1
+      kind: Application
+      metadata:
+        name: fint-org-monitor
+        labels:
+          app.kubernetes.io/instance: fint-org-monitor_bfk_no
+      spec:
+        orgId: bfk.no
+        env:
+          - name: fint.environment
+            value: api
+          - name: fint.orgmonitor.sender
+            value: drift@vigoiks.no
+          - name: fint.orgmonitor.recipients
+            value: "integrasjoner.elements@bfk.no, olegia@bfk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no"
     target:
       kind: Application
       name: fint-org-monitor
 
   - patch: |-
-      - op: replace
-        path: "/metadata/labels/app.kubernetes.io~1instance"
-        value: "fint-org-monitor-client_bfk_no"
-      - op: replace
-        path: "/spec/orgId"
-        value: "bfk.no"
+      apiVersion: fintlabs.no/v1alpha1
+      kind: FintClient
+      metadata:
+        name: fint-org-monitor-client
+        labels:
+          app.kubernetes.io/instance: fint-org-monitor-client_bfk_no
+      spec:
+        orgId: bfk.no
     target:
       kind: FintClient
       name: fint-org-monitor-client

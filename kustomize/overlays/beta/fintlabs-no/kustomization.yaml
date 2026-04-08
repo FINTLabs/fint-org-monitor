@@ -1,17 +1,17 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: afk-no
+namespace: fintlabs-no
 resources:
   - ../../../base
 labels:
   - pairs:
       app.kubernetes.io/name: fint-org-monitor
-      app.kubernetes.io/instance: fint-org-monitor_afk_no
+      app.kubernetes.io/instance: fint-org-monitor_fintlabs_no
       app.kubernetes.io/version: latest
       app.kubernetes.io/component: backend
       app.kubernetes.io/part-of: fint-core
       fintlabs.no/team: core
-      fintlabs.no/org-id: afk.no
+      fintlabs.no/org-id: fintlabs.no
 patches:
   - patch: |-
       apiVersion: fintlabs.no/v1alpha1
@@ -19,16 +19,16 @@ patches:
       metadata:
         name: fint-org-monitor
         labels:
-          app.kubernetes.io/instance: fint-org-monitor_afk_no
+          app.kubernetes.io/instance: fint-org-monitor_fintlabs_no
       spec:
-        orgId: afk.no
+        orgId: fintlabs.no
         env:
           - name: fint.environment
-            value: api
+            value: beta
           - name: fint.orgmonitor.sender
             value: drift@vigoiks.no
           - name: fint.orgmonitor.recipients
-            value: "integrasjoner.elements@afk.no, maritj@afk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no"
+            value: daniel.johnsen@novari.no
     target:
       kind: Application
       name: fint-org-monitor
@@ -39,9 +39,9 @@ patches:
       metadata:
         name: fint-org-monitor-client
         labels:
-          app.kubernetes.io/instance: fint-org-monitor-client_afk_no
+          app.kubernetes.io/instance: fint-org-monitor-client_fintlabs_no
       spec:
-        orgId: afk.no
+        orgId: fintlabs.no
     target:
       kind: FintClient
       name: fint-org-monitor-client
