@@ -10,7 +10,6 @@ import no.novari.fint.model.resource.administrasjon.organisasjon.Organisasjonsel
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
-import org.springframework.util.StringUtils
 
 /**
  * Service responsible for monitoring and updating organization elements.
@@ -52,7 +51,15 @@ class OrganizationService(
     fun update() {
         val documents = organizationRepository.getAllByOrgId(config.orgid)
         logger.info("Repository contains ${documents.size} documents for ${config.orgid}.")
-        val organizationMap = documents.associateBy { it.data?.organisasjonsId?.identifikatorverdi }
+        // Create a map with the OrganizationMap's id as key, and OrganizationMap itself as the value.
+        val organizationMap =
+            documents
+                .mapNotNull { doc ->
+                    doc.data
+                        ?.organisasjonsId
+                        ?.identifikatorverdi
+                        ?.let { id -> id to doc }
+                }.toMap()
 
         val updates = fetchUpdates() ?: return
         logger.info("Found ${updates.size} updates")
@@ -85,7 +92,7 @@ class OrganizationService(
 
     private fun collectChanges(
         resources: List<OrganisasjonselementResource>,
-        organizationMap: Map<String?, OrganizationDocument>,
+        organizationMap: Map<String, OrganizationDocument>,
     ): UpdateChanges {
         val changes = UpdateChanges()
 
@@ -110,7 +117,7 @@ class OrganizationService(
         resourceId: String,
         existingDocument: OrganizationDocument,
         changes: UpdateChanges,
-        organizationMap: Map<String?, OrganizationDocument>,
+        organizationMap: Map<String, OrganizationDocument>,
     ) {
         modifiedDocument.id = resourceId
         changes.documentsToSave.add(modifiedDocument)
@@ -124,29 +131,25 @@ class OrganizationService(
             ),
         )
 
-        registerParentId(modifiedDocument.overordnet, organizationMap, changes)
+        modifiedDocument.overordnet?.let { registerParentId(it, organizationMap, changes) }
     }
 
     private fun storeNewDocument(
         newDocument: OrganizationDocument,
         changes: UpdateChanges,
-        organizationMap: Map<String?, OrganizationDocument>,
+        organizationMap: Map<String, OrganizationDocument>,
     ) {
         changes.documentsToSave.add(newDocument)
         changes.addedDocuments.add(newDocument)
 
-        registerParentId(newDocument.overordnet, organizationMap, changes)
+        newDocument.overordnet?.let { registerParentId(it, organizationMap, changes) }
     }
 
     private fun registerParentId(
-        parentHref: String?,
-        organizationMap: Map<String?, OrganizationDocument>,
+        parentHref: String,
+        organizationMap: Map<String, OrganizationDocument>,
         changes: UpdateChanges,
     ) {
-        if (!StringUtils.hasText(parentHref)) {
-            return
-        }
-
         organizationMap[parentHref]?.id?.let(changes.parentIds::add)
     }
 
