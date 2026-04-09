@@ -2,6 +2,7 @@
 name: manual-deployment
 permissions:
   contents: read
+  packages: write
 on:
   workflow_dispatch:
     inputs:
