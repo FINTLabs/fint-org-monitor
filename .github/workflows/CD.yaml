@@ -38,7 +38,17 @@ jobs:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: type=sha,enable=true,priority=100,prefix=sha-,suffix=,format=short
 
+      - name: Check if image already exists
+        id: check
+        run: |
+          if docker manifest inspect ${{ steps.meta.outputs.tags }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push Docker image
+        if: steps.check.outputs.exists == 'false'
         uses: docker/build-push-action@v6
         with:
           context: .
