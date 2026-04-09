@@ -53,7 +53,7 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mongodb'
     testImplementation 'org.wiremock:wiremock-standalone:3.13.2'
-    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.0.8'
+    testImplementation 'org.wiremock.integrations:wiremock-spring-boot:4.2.1'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
