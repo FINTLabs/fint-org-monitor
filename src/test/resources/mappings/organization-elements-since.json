@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": "/administrasjon/organisasjon/organisasjonselement\\?sinceTimeStamp=\\d+"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "bodyFileName": "organization-elements-since.json"
+  }
+}

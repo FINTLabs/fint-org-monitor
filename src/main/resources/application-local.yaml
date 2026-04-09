@@ -1,9 +1,25 @@
-spring:
-  data:
-    mongodb:
-      database: org-monitor
-      uri: mongodb://mongodb:mongodb@localhost:27017
-
 fint:
+  database:
+    url: mongodb://mongodb:mongodb@localhost:27017/app?authSource=admin
+  environment: alpha
   orgmonitor:
-    cron: "*/20 * * * * *"
+    application-name: FINT Organization Monitor
+    recipients:
+    endpoint: https://${fint.environment}.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
+    orgid: ${fint.org-id}
+    cron: '0 15 8-14/2 * * *'
+    interval: 3600000
+    smtpUsername: 
+    smtpPassword: 
+    smtpServer: 
+    smtpHost: outlook.office365.com
+    smtpPort: 587
+  oauth:
+    access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
+    username: 
+    password: 
+    client-id: 
+    client-secret: 
+    enabled: true
+    scope: fint-client
+

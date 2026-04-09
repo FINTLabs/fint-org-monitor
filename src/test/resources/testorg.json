@@ -25,12 +25,12 @@
       ]
     }
   },
-  "overordnet": "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/156",
+  "overordnet": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/156",
   "underordnet": [
-    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/763",
-    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/766",
-    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/770",
-    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/775",
-    "https://api.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/776"
+    "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/763",
+    "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/766",
+    "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/770",
+    "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/775",
+    "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/776"
   ]
 }

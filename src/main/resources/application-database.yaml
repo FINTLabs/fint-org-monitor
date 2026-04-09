@@ -1,5 +1,4 @@
 spring:
   data:
     mongodb:
-      database: org-monitor-api
-      uri: ${fint.database.uri}
+      uri: ${fint.database.url}

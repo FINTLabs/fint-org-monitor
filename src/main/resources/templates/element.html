@@ -22,10 +22,15 @@
             <td th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</td>
         </tr>
     </table>
-    <p>Overordnet: <span th:text="${item.overordnetId()}">over</span></p>
-    <p>Underordnet: <span th:text="${#strings.listJoin(item.underordnetId(), ', ')}">under</span></p>
-    <p>GyldighetsPeriode start: <span th:text="${item.data.gyldighetsperiode.getStart()}">Start:</span></p>
-    <p>GyldighetsPeriode Slutt: <span th:text="${item.data.gyldighetsperiode.getSlutt}">Slutt:</span></p>
+    <p>Overordnet: <span th:text="${item.overordnet}">over</span></p>
+    <div th:if="${not #lists.isEmpty(item.underordnet)}">
+        <p>Underordnet:</p>
+        <ul>
+            <li th:each="child : ${item.underordnet}" th:text="${child}">under</li>
+        </ul>
+    </div>
+    <p>GyldighetsPeriode start: <span th:text="${item.data.gyldighetsperiode.start}">Start:</span></p>
+    <p>GyldighetsPeriode Slutt: <span th:text="${item.data.gyldighetsperiode.slutt}">Slutt:</span></p>
 </div>
 </body>
 </html>
