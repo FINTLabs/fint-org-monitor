@@ -3,6 +3,7 @@ package no.fint
 import no.fint.organization.OrganizationService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.ApplicationArguments
 import org.springframework.boot.ApplicationRunner
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -19,7 +20,11 @@ class UpdateRunner : ApplicationRunner {
     @Autowired
     private lateinit var organizationService: OrganizationService
 
+    @Value("\${fint.database.url:not configured}")
+    private lateinit var databaseUrl: String
+
     override fun run(args: ApplicationArguments) {
+        logger.info("fint.database.url: {}", databaseUrl.replace(Regex("://[^:]+:[^@]+@"), "://*****:*****@"))
         logger.info("Running Organization update check")
         organizationService.update()
     }
