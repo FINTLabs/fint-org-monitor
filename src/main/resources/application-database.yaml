@@ -1,4 +1,4 @@
 spring:
   data:
     mongodb:
-      uri: ${fint.database.url}
+      uri: ${fint.database.uri}
