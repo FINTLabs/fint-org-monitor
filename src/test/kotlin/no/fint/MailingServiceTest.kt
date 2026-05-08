@@ -15,15 +15,16 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class MailingServiceTest {
-    private val config = Config(
-        orgid = "fintlabs.no",
-        sender = "sender@fintlabs.no",
-        smtpUsername = "user",
-        smtpPassword = "password",
-        smtpServer = "localhost",
-        smtpPort = "25",
-        recipients = listOf("recipient@fintlabs.no"),
-    )
+    private val config =
+        Config(
+            orgid = "fintlabs.no",
+            sender = "sender@fintlabs.no",
+            smtpUsername = "user",
+            smtpPassword = "password",
+            smtpServer = "localhost",
+            smtpPort = "25",
+            recipients = listOf("recipient@fintlabs.no"),
+        )
 
     private val mailingService = MailingService(config)
 

@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.ConcurrentSkipListMap
-import kotlin.text.clear
 
 /**
  * Utility class for performing REST operations and tracking last updated timestamps per URI.
