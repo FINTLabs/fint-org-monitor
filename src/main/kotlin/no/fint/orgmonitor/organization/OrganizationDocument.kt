@@ -1,4 +1,4 @@
-package no.fint.organization
+package no.fint.orgmonitor.organization
 
 import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
 import org.springframework.data.annotation.Id

@@ -1,6 +1,6 @@
-package no.fint.mailing
+package no.fint.orgmonitor.mailing
 
-import no.fint.Config
+import no.fint.orgmonitor.Config
 import java.util.Properties
 import javax.mail.Authenticator
 import javax.mail.Message

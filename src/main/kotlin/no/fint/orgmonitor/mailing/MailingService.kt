@@ -1,8 +1,9 @@
-package no.fint.mailing
+package no.fint.orgmonitor.mailing
 
-import no.fint.Config
+import no.fint.orgmonitor.Config
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import javax.mail.MessagingException
 import javax.mail.Transport
 import javax.mail.internet.MimeMessage
@@ -27,7 +28,7 @@ class MailingService(
     private fun createMimeMessage(content: String): MimeMessage = FintMimeMessage(config, content, generateSubject()).mail
 
     private fun generateSubject() =
-        java.time.LocalDateTime.now().let { now ->
+        LocalDateTime.now().let { now ->
             "Org Monitor for ${config.orgid} ${now.toLocalDate()} ${now.toLocalTime().withNano(0) }"
         }
 

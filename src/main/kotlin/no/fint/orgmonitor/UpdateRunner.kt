@@ -1,6 +1,6 @@
-package no.fint
+package no.fint.orgmonitor
 
-import no.fint.organization.OrganizationService
+import no.fint.orgmonitor.organization.OrganizationService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationArguments

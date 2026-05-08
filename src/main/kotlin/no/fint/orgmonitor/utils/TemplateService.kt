@@ -1,7 +1,7 @@
-package no.fint.utils
+package no.fint.orgmonitor.utils
 
-import no.fint.organization.OrganizationDocument
-import no.fint.organization.SimpleOrganizationInfo
+import no.fint.orgmonitor.organization.OrganizationDocument
+import no.fint.orgmonitor.organization.SimpleOrganizationInfo
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context

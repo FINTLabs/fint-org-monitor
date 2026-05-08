@@ -1,6 +1,6 @@
-package no.fint.utils
+package no.fint.orgmonitor.utils
 
-import no.fint.Config
+import no.fint.orgmonitor.Config
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference

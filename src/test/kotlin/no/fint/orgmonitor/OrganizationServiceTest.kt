@@ -1,14 +1,14 @@
-package no.fint
+package no.fint.orgmonitor
 
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.matching
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
-import no.fint.mailing.MailingService
-import no.fint.organization.OrganizationDocument
-import no.fint.organization.OrganizationRepository
-import no.fint.organization.OrganizationService
-import no.fint.utils.TemplateService
+import no.fint.orgmonitor.mailing.MailingService
+import no.fint.orgmonitor.organization.OrganizationDocument
+import no.fint.orgmonitor.organization.OrganizationRepository
+import no.fint.orgmonitor.organization.OrganizationService
+import no.fint.orgmonitor.utils.TemplateService
 import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
 import no.novari.fint.model.felles.kompleksedatatyper.Periode
@@ -25,6 +25,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.Instant
 import java.util.Date
 
 @SpringBootTest
@@ -60,7 +61,7 @@ class OrganizationServiceTest(
                 kortnavn = "VGKALN"
                 gyldighetsperiode =
                     Periode().apply {
-                        start = Date.from(java.time.Instant.parse("2019-04-01T00:00:00Z"))
+                        start = Date.from(Instant.parse("2019-04-01T00:00:00Z"))
                     }
             }
 

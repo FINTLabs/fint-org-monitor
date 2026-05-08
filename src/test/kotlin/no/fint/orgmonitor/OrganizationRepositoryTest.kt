@@ -1,7 +1,7 @@
-package no.fint
+package no.fint.orgmonitor
 
-import no.fint.organization.OrganizationDocument
-import no.fint.organization.OrganizationRepository
+import no.fint.orgmonitor.organization.OrganizationDocument
+import no.fint.orgmonitor.organization.OrganizationRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

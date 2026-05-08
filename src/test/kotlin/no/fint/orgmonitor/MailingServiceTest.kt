@@ -1,11 +1,11 @@
-package no.fint
+package no.fint.orgmonitor
 
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockkStatic
 import io.mockk.runs
 import io.mockk.unmockkStatic
-import no.fint.mailing.MailingService
+import no.fint.orgmonitor.mailing.MailingService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

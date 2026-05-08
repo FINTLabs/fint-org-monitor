@@ -1,4 +1,4 @@
-package no.fint
+package no.fint.orgmonitor
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration

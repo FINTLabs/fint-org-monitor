@@ -1,4 +1,4 @@
-package no.fint
+package no.fint.orgmonitor
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component

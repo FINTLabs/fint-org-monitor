@@ -1,10 +1,10 @@
-package no.fint.organization
+package no.fint.orgmonitor.organization
 
-import no.fint.Config
-import no.fint.mailing.MailingService
-import no.fint.utils.ResourceConverter
-import no.fint.utils.RestUtil
-import no.fint.utils.TemplateService
+import no.fint.orgmonitor.Config
+import no.fint.orgmonitor.mailing.MailingService
+import no.fint.orgmonitor.utils.ResourceConverter
+import no.fint.orgmonitor.utils.RestUtil
+import no.fint.orgmonitor.utils.TemplateService
 import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResource
 import no.novari.fint.model.resource.administrasjon.organisasjon.OrganisasjonselementResources
 import org.slf4j.LoggerFactory

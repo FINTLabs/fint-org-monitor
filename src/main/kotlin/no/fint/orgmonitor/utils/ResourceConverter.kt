@@ -1,4 +1,4 @@
-package no.fint.utils
+package no.fint.orgmonitor.utils
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper

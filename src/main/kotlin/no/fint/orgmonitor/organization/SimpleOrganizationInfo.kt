@@ -1,4 +1,4 @@
-package no.fint.organization
+package no.fint.orgmonitor.organization
 
 data class SimpleOrganizationInfo(
     val orgUnitId: String,
