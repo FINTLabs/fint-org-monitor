@@ -1,5 +1,5 @@
 apiVersion: fintlabs.no/v1alpha1
-kind: Application
+kind: Job
 metadata:
   name: fint-org-monitor
   namespace: fintlabs-no
@@ -12,6 +12,7 @@ metadata:
     fintlabs.no/team: core
     fintlabs.no/org-id: fintlabs.no
 spec:
+  cron: "0 2 * * *"
   port: 8080
   orgId: fintlabs.no
   image: ghcr.io/fintlabs/fint-org-monitor:sha-00000

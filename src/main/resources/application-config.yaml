@@ -5,8 +5,6 @@ fint:
     recipients:
     endpoint: https://${fint.environment}.felleskomponent.no/administrasjon/organisasjon/organisasjonselement
     orgid: ${fint.org-id}
-    cron: '0 15 8-14/2 * * *'
-    interval: 3600000
     smtpUsername:
     smtpPassword:
     smtpServer:

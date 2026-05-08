@@ -20,11 +20,7 @@ class UpdateRunner : ApplicationRunner {
     @Autowired
     private lateinit var organizationService: OrganizationService
 
-    @Value("\${fint.database.url:not configured}")
-    private lateinit var databaseUrl: String
-
     override fun run(args: ApplicationArguments) {
-        logger.info("fint.database.url: {}", databaseUrl.replace(Regex("://[^:]+:[^@]+@"), "://*****:*****@"))
         logger.info("Running Organization update check")
         organizationService.update()
     }
