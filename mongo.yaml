@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mongo-client
+spec:
+  restartPolicy: Never
+  containers:
+    - name: mongo-client
+      image: mongo:7
+      command: ["bash"]
+      stdin: true
+      tty: true
