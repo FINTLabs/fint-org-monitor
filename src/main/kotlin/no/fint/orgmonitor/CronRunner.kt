@@ -1,4 +1,7 @@
+package no.fint.orgmonitor
+
 import no.fint.orgmonitor.organization.OrganizationService
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
@@ -9,8 +12,11 @@ import org.springframework.stereotype.Service
 class CronRunner(
     private val organizationService: OrganizationService,
 ) {
+    private val logger = LoggerFactory.getLogger(javaClass)
+
     @Scheduled(cron = "\${fint.orgmonitor.cron}")
     fun update() {
+        logger.debug("Starting update")
         organizationService.update()
     }
 }
