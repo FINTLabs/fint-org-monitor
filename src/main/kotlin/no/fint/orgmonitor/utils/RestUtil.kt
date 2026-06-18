@@ -1,71 +1,68 @@
 package no.fint.orgmonitor.utils
 
 import no.fint.orgmonitor.Config
+import no.fint.orgmonitor.sync.SyncStateRepository
 import org.slf4j.LoggerFactory
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
-import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import java.util.concurrent.ConcurrentMap
-import java.util.concurrent.ConcurrentSkipListMap
 
 /**
- * Utility class for performing REST operations and tracking last updated timestamps per URI.
+ * Utility class for performing REST operations.
  *
- * @property restTemplate the RestTemplate used for HTTP requests
+ * The last-seen update timestamp is read from the database (persisted per orgId) so that it
+ * survives restarts. This class only reads it; the caller persists the new timestamp once an
+ * update has been processed successfully.
  */
 @Component
 class RestUtil(
-    restTemplateBuilder: RestTemplateBuilder,
     private val config: Config,
     private val idpClient: RestClient,
+    private val syncStateRepository: SyncStateRepository,
 ) {
-    private val restTemplate: RestTemplate = restTemplateBuilder.build()
-
-    // TODO: this will not persist between runs of FlaisJob. Needs to be persisted in database
-    private val lastUpdatedMap: ConcurrentMap<String, Long> = ConcurrentSkipListMap()
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     /**
-     * Fetches updates from the URI set in endpoint config since the last known update timestamp.
-     * Updates the internal lastUpdatedMap with the latest timestamp.
+     * Fetches updates from the configured endpoint since the last persisted update timestamp.
+     *
      *
      * @param type the type reference for the response body
-     * @return the response body of type T
+     * @return a pair of the response body of type T and the latest timestamp reported by the API
      * @throws IllegalArgumentException if the response body or lastUpdated value is missing
      */
-    fun <T> getUpdates(type: ParameterizedTypeReference<T>): T =
-        lastUpdatedMap.getOrDefault(config.endpoint, 0L).let { since ->
-            logger.info("Fetching since $since")
-            // get all OrganisasjonsElement that was updated since timestamp `since`
-            val result =
+    fun <T> getUpdates(type: ParameterizedTypeReference<T>): Pair<T, Long> {
+        val since =
+            syncStateRepository
+                .findById(config.orgid)
+                .map { it.lastUpdated }
+                .orElse(0L)
+        logger.info("Fetching since $since")
+        // get all OrganisasjonsElement that was updated since timestamp `since`
+        val result =
+            get(
+                type,
+                UriComponentsBuilder
+                    .fromUriString(config.endpoint)
+                    .queryParam("sinceTimeStamp", since)
+                    .build()
+                    .toUriString(),
+            )
+        // get last-updated timestamp from API
+        val lastUpdated =
+            requireNotNull(
                 get(
-                    type,
+                    // ParameterizedTypeReference is used to get the generic data without an explicit type.
+                    object : ParameterizedTypeReference<MutableMap<String, String>>() {},
                     UriComponentsBuilder
                         .fromUriString(config.endpoint)
-                        .queryParam("sinceTimeStamp", since)
+                        .pathSegment("last-updated")
                         .build()
                         .toUriString(),
-                )
-            // get last-updated timestamp from API
-            val lastUpdated =
-                requireNotNull(
-                    get(
-                        // ParameterizedTypeReference is used to get the generic data without an explicit type.
-                        object : ParameterizedTypeReference<MutableMap<String, String>>() {},
-                        UriComponentsBuilder
-                            .fromUriString(config.endpoint)
-                            .pathSegment("last-updated")
-                            .build()
-                            .toUriString(),
-                    )["lastUpdated"],
-                ) { "No lastUpdated value from ${config.endpoint}" }.toLong()
-            lastUpdatedMap[config.endpoint] = lastUpdated
-            result
-        }
+                )["lastUpdated"],
+            ) { "No lastUpdated value from ${config.endpoint}" }.toLong()
+        return result to lastUpdated
+    }
 
     /**
      * Performs a GET request to the specified URI and returns the response body.

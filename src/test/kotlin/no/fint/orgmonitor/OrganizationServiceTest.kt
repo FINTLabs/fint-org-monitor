@@ -8,6 +8,7 @@ import no.fint.orgmonitor.mailing.MailingService
 import no.fint.orgmonitor.organization.OrganizationDocument
 import no.fint.orgmonitor.organization.OrganizationRepository
 import no.fint.orgmonitor.organization.OrganizationService
+import no.fint.orgmonitor.sync.SyncStateRepository
 import no.fint.orgmonitor.utils.TemplateService
 import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
@@ -34,6 +35,7 @@ import java.util.Date
 class OrganizationServiceTest(
     @param:Autowired private val organizationRepository: OrganizationRepository,
     @param:Autowired private val organizationService: OrganizationService,
+    @param:Autowired private val syncStateRepository: SyncStateRepository,
 ) : BaseIntegrationTest() {
     @MockitoBean
     private lateinit var mailingService: MailingService
@@ -44,6 +46,7 @@ class OrganizationServiceTest(
     @AfterEach
     fun cleanup() {
         organizationRepository.deleteAll()
+        syncStateRepository.deleteAll()
     }
 
     @BeforeEach

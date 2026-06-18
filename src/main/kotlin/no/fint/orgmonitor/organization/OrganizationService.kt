@@ -2,6 +2,8 @@ package no.fint.orgmonitor.organization
 
 import no.fint.orgmonitor.Config
 import no.fint.orgmonitor.mailing.MailingService
+import no.fint.orgmonitor.sync.SyncState
+import no.fint.orgmonitor.sync.SyncStateRepository
 import no.fint.orgmonitor.utils.ResourceConverter
 import no.fint.orgmonitor.utils.RestUtil
 import no.fint.orgmonitor.utils.TemplateService
@@ -26,6 +28,7 @@ class OrganizationService(
     private val restUtil: RestUtil,
     private val mailingService: MailingService,
     private val templateService: TemplateService,
+    private val syncStateRepository: SyncStateRepository,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -61,7 +64,7 @@ class OrganizationService(
                         ?.let { id -> id to doc }
                 }.toMap()
 
-        val updates = fetchUpdates() ?: return
+        val (updates, lastUpdated) = fetchUpdates() ?: return
         logger.info("Found ${updates.size} updates")
         logger.trace(
             "Updates content: {}",
@@ -75,19 +78,24 @@ class OrganizationService(
         logger.info("Updated: {} items", changes.updatedPairs.size)
 
         sendNotification(changes)
+
+        // Persist the watermark only after the update has been processed successfully, so a
+        // crash mid-processing leaves it untouched and the next run retries the same window.
+        syncStateRepository.save(SyncState(config.orgid, lastUpdated))
     }
 
-    private fun fetchUpdates(): OrganisasjonselementResources? {
-        val updates =
+    private fun fetchUpdates(): Pair<OrganisasjonselementResources, Long>? {
+        val (updates, lastUpdated) =
             restUtil.getUpdates(
                 object : ParameterizedTypeReference<OrganisasjonselementResources?>() {},
             )
 
         if (updates == null) {
             logger.error("Failed to fetch updates from endpoint")
+            return null
         }
 
-        return updates
+        return updates to lastUpdated
     }
 
     private fun collectChanges(
