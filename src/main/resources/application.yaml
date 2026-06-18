@@ -10,3 +10,9 @@ spring:
       - oauth
       - config
       - database
+
+jakarta:
+  validation:
+    constraints:
+      NotBlank:
+        message: "Cannot be blank"

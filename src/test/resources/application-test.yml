@@ -8,12 +8,18 @@ fint:
     sender: asgeir@fintlabs.no
     orgid: fintlabs.no
     cron: "*/30 * * * * *"
-  core:
+  security:
     oauth2:
-      username: 123
-      password: 123
-      client-id: 123
-      client-secret: 123
+      clients:
+        fint-core:
+          token-uri: "https://example.com"
+          client-id: 1234456789
+          client-secret: secret
+          authorization-grant-type: client_credentials
+  core:
+    idp:
+      url: "https://example.com"
+      oauth-client: "fint-core"
   oauth:
     enabled: false
   sync:

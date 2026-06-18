@@ -4,8 +4,8 @@ import no.fint.orgmonitor.Config
 import org.slf4j.LoggerFactory
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
+import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.ConcurrentMap
@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentSkipListMap
 class RestUtil(
     restTemplateBuilder: RestTemplateBuilder,
     private val config: Config,
+    private val idpClient: RestClient,
 ) {
     private val restTemplate: RestTemplate = restTemplateBuilder.build()
 
@@ -78,9 +79,13 @@ class RestUtil(
         type: ParameterizedTypeReference<T>,
         uri: String,
     ): T =
-        restTemplate.exchange(uri, HttpMethod.GET, null, type).let { response ->
-            logger.info("GET $uri")
-            logger.info("Response: ${response.statusCode}")
-            requireNotNull(response.body) { "No response body from $uri" }
-        }
+        idpClient
+            .get()
+            .uri(uri)
+            .retrieve()
+            .body(type)
+            .let { body ->
+                logger.info("GET $uri")
+                requireNotNull(body) { "No response body from $uri" }
+            }
 }

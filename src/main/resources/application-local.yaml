@@ -14,12 +14,17 @@ fint:
     smtpServer: 
     smtpHost: outlook.office365.com
     smtpPort: 587
-  oauth:
-    access-token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
-    username: 
-    password: 
-    client-id: 
-    client-secret: 
-    enabled: true
-    scope: fint-client
+  security:
+    oauth2:
+      clients:
+        fint-core:
+          issuer-uri: https://idp.felleskomponent.no/
+          token-uri: https://idp.felleskomponent.no/nidp/oauth/nam/token
+          client-id:
+          client-secret:
+          authorization-grant-type: password
+          username:
+          password:
+          scope:
+            - fint-client
 
