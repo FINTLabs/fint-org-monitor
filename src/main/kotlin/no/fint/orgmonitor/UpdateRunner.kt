@@ -20,7 +20,8 @@ class UpdateRunner : ApplicationRunner {
     private lateinit var organizationService: OrganizationService
 
     override fun run(args: ApplicationArguments) {
-        logger.info("Running Organization update check")
-        organizationService.update()
+        // disabled until flaisjob is deployed
+//        logger.info("Running Organization update check")
+//        organizationService.update()
     }
 }
