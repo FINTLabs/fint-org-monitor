@@ -170,7 +170,10 @@ class OrganizationService(
 
     private fun createDocument(resource: OrganisasjonselementResource) =
         OrganizationDocument().apply {
-            id = resource.organisasjonsId.identifikatorverdi
+            // Scope the MongoDB _id by orgId. The namespaces (afk.no, bfk.no and ofk.no) share one collection, and
+            // identifikatorverdi values collide across orgs, so a bare _id let one org's save
+            // overwrite another org's document.
+            id = "${config.orgid}:${resource.organisasjonsId.identifikatorverdi}"
             orgId = config.orgid
             data = ResourceConverter.toOrganisasjonselement(resource)
             overordnet = resource.overordnet.firstOrNull()?.href

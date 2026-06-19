@@ -281,13 +281,83 @@ class OrganizationServiceTest(
         organizationService.update()
 
         // Both new docs persisted under their own id (regression: previously saved with empty id and collided).
-        assert(organizationRepository.findById("1001").isPresent) { "Document 1001 was not persisted" }
-        assert(organizationRepository.findById("1002").isPresent) { "Document 1002 was not persisted" }
+        assert(organizationRepository.findById("fintlabs.no:1001").isPresent) { "Document 1001 was not persisted" }
+        assert(organizationRepository.findById("fintlabs.no:1002").isPresent) { "Document 1002 was not persisted" }
 
         // Second run with identical data: nothing changed, so no new notification.
         organizationService.update()
 
         verify(mailingService, times(1)).send(anyString())
+    }
+
+    @Test
+    fun `update for one org does not override another org's document with the same identifikatorverdi`() {
+        // Seed a document belonging to a DIFFERENT org under the colliding bare identifikatorverdi.
+        // afk.no and bfk.no share one collection and have overlapping identifikatorverdi values, so a
+        // bare _id let one org's saveAll() upsert overwrite the other org's document. We seed at the
+        // bare id "1001" on purpose: it is the exact _id the buggy code computes, so a regression back
+        // to a bare _id would upsert over this document and fail the assertions below.
+        val otherOrgElement =
+            Organisasjonselement().apply {
+                organisasjonsId = Identifikator().apply { identifikatorverdi = "1001" }
+                organisasjonsKode = Identifikator().apply { identifikatorverdi = "OTHER" }
+                organisasjonsnummer = Identifikator().apply { identifikatorverdi = "111111111" }
+                navn = "Annen org enhet"
+                kortnavn = "ANNEN"
+                gyldighetsperiode =
+                    Periode().apply { start = Date.from(Instant.parse("2019-04-01T00:00:00Z")) }
+            }
+        organizationRepository.save(
+            OrganizationDocument(
+                id = "1001",
+                orgId = "annen.no",
+                data = otherOrgElement,
+            ),
+        )
+
+        // fintlabs.no (the test profile's orgid) receives an update for the same identifikatorverdi.
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .withQueryParam("sinceTimeStamp", matching("\\d+"))
+                .willReturn(
+                    okJson(
+                        """
+                        {
+                          "_embedded": {
+                            "_entries": [
+                              {
+                                "navn": "Hovedkontor",
+                                "kortnavn": "HK",
+                                "organisasjonsId": { "identifikatorverdi": "1001" },
+                                "organisasjonsKode": { "identifikatorverdi": "ORG_1" },
+                                "organisasjonsnummer": { "identifikatorverdi": "999999999" },
+                                "gyldighetsperiode": { "start": "2019-04-01T00:00:00Z" },
+                                "_links": {
+                                  "self": [ { "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001" } ]
+                                }
+                              }
+                            ]
+                          },
+                          "total_items": 1
+                        }
+                        """.trimIndent(),
+                    ),
+                ),
+        )
+        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
+
+        organizationService.update()
+
+        // The other org's document survives untouched: still present, still its org, still its data.
+        val otherDoc = organizationRepository.findById("1001")
+        assert(otherDoc.isPresent) { "annen.no document was overwritten/removed by the fintlabs.no update" }
+        assert(otherDoc.get().orgId == "annen.no") { "annen.no document's orgId was flipped to ${otherDoc.get().orgId}" }
+        assert(otherDoc.get().data?.navn == "Annen org enhet") { "annen.no document's data was overwritten" }
+
+        // fintlabs.no got its own org-scoped document.
+        val fintlabsDoc = organizationRepository.findById("fintlabs.no:1001")
+        assert(fintlabsDoc.isPresent) { "fintlabs.no document was not persisted under its org-scoped id" }
+        assert(fintlabsDoc.get().orgId == "fintlabs.no") { "fintlabs.no document has wrong orgId" }
     }
 
     @Test
