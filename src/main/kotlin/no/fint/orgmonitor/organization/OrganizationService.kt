@@ -112,7 +112,7 @@ class OrganizationService(
             if (existingDocument == null) { // New document
                 storeNewDocument(newDocument, changes, organizationMap)
             } else if (existingDocument != newDocument) { // Changed document
-                storeModifiedDocument(newDocument, resourceId, existingDocument, changes, organizationMap)
+                storeModifiedDocument(newDocument, existingDocument, changes, organizationMap)
             }
             // If none of the above, then we do nothing as there is no change.
         }
@@ -122,16 +122,14 @@ class OrganizationService(
 
     private fun storeModifiedDocument(
         modifiedDocument: OrganizationDocument,
-        resourceId: String,
         existingDocument: OrganizationDocument,
         changes: UpdateChanges,
         organizationMap: Map<String, OrganizationDocument>,
     ) {
-        modifiedDocument.id = resourceId
+        // id is already set by createDocument from the resource's organisasjonsId
         changes.documentsToSave.add(modifiedDocument)
 
         // A little ugly to use .copy(), but necessary to avoid existingDocument being modified after it is added to updatedPairs
-        // The pointer to underordnet is copied.
         changes.updatedPairs.add(
             Pair(
                 existingDocument.copy(underordnet = existingDocument.underordnet?.toList()),
@@ -172,6 +170,7 @@ class OrganizationService(
 
     private fun createDocument(resource: OrganisasjonselementResource) =
         OrganizationDocument().apply {
+            id = resource.organisasjonsId.identifikatorverdi
             orgId = config.orgid
             data = ResourceConverter.toOrganisasjonselement(resource)
             overordnet = resource.overordnet.firstOrNull()?.href
