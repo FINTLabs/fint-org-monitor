@@ -22,7 +22,7 @@ class TemplateService(
                 setVariable("added", added)
                 setVariable("updated", updated.map { UpdatedOrganizationReport.from(it.first, it.second) })
                 setVariable("parentInfo", parentInfo)
-                setVariable("emptyChangedFields", emptySet<String>())
+                setVariable("emptyChangedFields", linkedSetOf<String>())
                 setVariable("highlightStyle", HIGHLIGHT_STYLE)
             },
         )

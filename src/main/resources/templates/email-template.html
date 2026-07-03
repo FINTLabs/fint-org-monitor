@@ -27,7 +27,7 @@
                 <tbody>
                 <tr>
                     <td>
-                        <div th:insert="~{element::org(${item.before}, ${item.changedFieldNames})}">...</div>
+                        <div th:insert="~{element::org(${item.before}, ${emptyChangedFields})}">...</div>
                     </td>
                     <td>
                         <div th:insert="~{element::org(${item.after}, ${item.changedFieldNames})}">...</div>
