@@ -2,6 +2,7 @@ package no.fint.orgmonitor.utils
 
 import no.fint.orgmonitor.organization.OrganizationDocument
 import no.fint.orgmonitor.organization.SimpleOrganizationInfo
+import no.fint.orgmonitor.organization.UpdatedOrganizationReport
 import org.springframework.stereotype.Service
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
@@ -19,8 +20,14 @@ class TemplateService(
             "email-template",
             Context().apply {
                 setVariable("added", added)
-                setVariable("updated", updated)
+                setVariable("updated", updated.map { UpdatedOrganizationReport.from(it.first, it.second) })
                 setVariable("parentInfo", parentInfo)
+                setVariable("emptyChangedFields", emptySet<String>())
+                setVariable("highlightStyle", HIGHLIGHT_STYLE)
             },
         )
+
+    private companion object {
+        const val HIGHLIGHT_STYLE = "background-color: #fff59d"
+    }
 }

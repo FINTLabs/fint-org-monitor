@@ -9,7 +9,7 @@
     <h2>Følgende organisasjonselementer er nye:</h2>
     <ol>
         <li th:each="item: ${added}">
-            <div th:insert="~{element::org(${item})}">...</div>
+            <div th:insert="~{element::org(${item}, ${emptyChangedFields})}">...</div>
         </li>
     </ol>
 </div>
@@ -27,10 +27,10 @@
                 <tbody>
                 <tr>
                     <td>
-                        <div style="background-color: #ffb7bd" th:insert="~{element::org(${item.first})}">...</div>
+                        <div th:insert="~{element::org(${item.before}, ${item.changedFieldNames})}">...</div>
                     </td>
                     <td>
-                        <div style="background-color: #dbffce" th:insert="~{element::org(${item.second})}">...</div>
+                        <div th:insert="~{element::org(${item.after}, ${item.changedFieldNames})}">...</div>
                     </td>
                 </tr>
                 </tbody>

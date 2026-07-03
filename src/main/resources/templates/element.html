@@ -5,7 +5,7 @@
     <title>Title</title>
 </head>
 <body>
-<div th:fragment="org(item)">
+<div th:fragment="org(item, changedFields)">
     <table th:object="${item.data}">
         <tr>
             <th>Kortnavn</th>
@@ -15,22 +15,30 @@
             <th>Org.nummer</th>
         </tr>
         <tr>
-            <td th:text="*{kortnavn}">kortnavn</td>
-            <td th:text="*{navn}">navn</td>
-            <td th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
-            <td th:text="*{organisasjonsId.identifikatorverdi}">id</td>
-            <td th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</td>
+            <td th:style="${changedFields.contains('KORTNAVN') ? highlightStyle : null}" th:text="*{kortnavn}">kortnavn</td>
+            <td th:style="${changedFields.contains('NAVN') ? highlightStyle : null}" th:text="*{navn}">navn</td>
+            <td th:style="${changedFields.contains('KODE') ? highlightStyle : null}" th:text="*{organisasjonsKode.identifikatorverdi}">kode</td>
+            <td th:style="${changedFields.contains('ID') ? highlightStyle : null}" th:text="*{organisasjonsId.identifikatorverdi}">id</td>
+            <td th:style="${changedFields.contains('ORGANISASJONSNUMMER') ? highlightStyle : null}" th:text="*{organisasjonsnummer?.identifikatorverdi}">orgnr</td>
         </tr>
     </table>
-    <p>Overordnet: <span th:text="${item.overordnet}">over</span></p>
-    <div th:if="${not #lists.isEmpty(item.underordnet)}">
+    <p th:style="${changedFields.contains('OVERORDNET') ? highlightStyle : null}">
+        Overordnet: <span th:text="${item.overordnet}">over</span>
+    </p>
+    <div th:if="${not #lists.isEmpty(item.underordnet) or changedFields.contains('UNDERORDNET')}"
+         th:style="${changedFields.contains('UNDERORDNET') ? highlightStyle : null}">
         <p>Underordnet:</p>
         <ul>
             <li th:each="child : ${item.underordnet}" th:text="${child}">under</li>
+            <li th:if="${#lists.isEmpty(item.underordnet)}">Ingen</li>
         </ul>
     </div>
-    <p>GyldighetsPeriode start: <span th:text="${item.data.gyldighetsperiode.start}">Start:</span></p>
-    <p>GyldighetsPeriode Slutt: <span th:text="${item.data.gyldighetsperiode.slutt}">Slutt:</span></p>
+    <p th:style="${changedFields.contains('GYLDIGHETSPERIODE_START') ? highlightStyle : null}">
+        GyldighetsPeriode start: <span th:text="${item.data.gyldighetsperiode.start}">Start:</span>
+    </p>
+    <p th:style="${changedFields.contains('GYLDIGHETSPERIODE_SLUTT') ? highlightStyle : null}">
+        GyldighetsPeriode Slutt: <span th:text="${item.data.gyldighetsperiode.slutt}">Slutt:</span>
+    </p>
 </div>
 </body>
 </html>
