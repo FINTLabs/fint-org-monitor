@@ -165,7 +165,9 @@ class OrganizationService(
         }
 
         val parentInfo = createParentInfo(changes.parentIds.toList())
-        mailingService.send(templateService.render(changes.addedDocuments, changes.updatedPairs, parentInfo))
+        // Reload after saveAll so the tree reflects the persisted post-update organization state.
+        val organizationTree = OrganizationTreeBuilder.build(organizationRepository.getAllByOrgId(config.orgid))
+        mailingService.send(templateService.render(changes.addedDocuments, changes.updatedPairs, parentInfo, organizationTree))
     }
 
     private fun createDocument(resource: OrganisasjonselementResource) =

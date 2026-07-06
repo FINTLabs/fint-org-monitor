@@ -29,6 +29,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant
 import java.util.Date
+import kotlin.test.assertTrue
 
 @SpringBootTest
 @Testcontainers
@@ -229,9 +230,24 @@ class OrganizationServiceTest(
                     ),
                 ),
         )
-        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
+        var organizationTree = ""
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+            .thenAnswer { invocation ->
+                organizationTree = invocation.getArgument(3)
+                "<html>Default Mock HTML</html>"
+            }
         organizationService.update()
-        verify(templateService).render(anyList(), anyList(), anyList())
+        verify(templateService).render(anyList(), anyList(), anyList(), anyString())
+        assertTrue(
+            organizationTree.contains(
+                """
+                Hovedkontor (1001)
+                |-- Avdeling A (1002)
+                `-- VGKALN Kalnes videregående skole (762)
+                """.trimIndent(),
+            ),
+            organizationTree,
+        )
     }
 
     @Test
@@ -275,7 +291,8 @@ class OrganizationServiceTest(
                     ),
                 )
         wireMockServer.stubFor(stub)
-        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+            .thenReturn("<html>Default Mock HTML</html>")
 
         // First run: both elements are new and must be added.
         organizationService.update()
@@ -344,7 +361,8 @@ class OrganizationServiceTest(
                     ),
                 ),
         )
-        `when`(templateService.render(anyList(), anyList(), anyList())).thenReturn("<html>Default Mock HTML</html>")
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+            .thenReturn("<html>Default Mock HTML</html>")
 
         organizationService.update()
 

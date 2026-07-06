@@ -1,0 +1,119 @@
+package no.fint.orgmonitor.organization
+
+import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
+import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+
+class OrganizationTreeBuilderTest {
+    @Test
+    fun `build creates unix-style tree with names and organization ids`() {
+        val tree =
+            OrganizationTreeBuilder.build(
+                listOf(
+                    document(
+                        organizationId = "100",
+                        name = "Root",
+                        children = listOf(href("200"), href("300")),
+                    ),
+                    document(
+                        organizationId = "200",
+                        name = "Child A",
+                        parent = href("100"),
+                        children = listOf(href("400")),
+                    ),
+                    document(
+                        organizationId = "300",
+                        name = "Child B",
+                        parent = href("100"),
+                    ),
+                    document(
+                        organizationId = "400",
+                        name = "Grandchild",
+                        parent = href("200"),
+                    ),
+                ),
+            )
+
+        assertEquals(
+            """
+            Root (100)
+            |-- Child A (200)
+            |   `-- Grandchild (400)
+            `-- Child B (300)
+            """.trimIndent(),
+            tree,
+        )
+    }
+
+    @Test
+    fun `build includes disconnected roots`() {
+        val tree =
+            OrganizationTreeBuilder.build(
+                listOf(
+                    document(organizationId = "200", name = "Second root"),
+                    document(organizationId = "100", name = "First root"),
+                ),
+            )
+
+        assertEquals(
+            """
+            First root (100)
+            Second root (200)
+            """.trimIndent(),
+            tree,
+        )
+    }
+
+    @Test
+    fun `build prefers org-scoped duplicate document so tree shows updated state`() {
+        val tree =
+            OrganizationTreeBuilder.build(
+                listOf(
+                    document(
+                        id = "762",
+                        organizationId = "762",
+                        name = "School",
+                        parent = href("156"),
+                    ),
+                    document(organizationId = "1001", name = "Root"),
+                    document(
+                        id = "fintlabs.no:762",
+                        organizationId = "762",
+                        name = "School",
+                        parent = href("1001"),
+                    ),
+                ),
+            )
+
+        assertEquals(
+            """
+            Root (1001)
+            `-- School (762)
+            """.trimIndent(),
+            tree,
+        )
+    }
+
+    private fun document(
+        id: String? = null,
+        organizationId: String,
+        name: String,
+        parent: String? = null,
+        children: List<String> = emptyList(),
+    ): OrganizationDocument =
+        OrganizationDocument(
+            id = id ?: "fintlabs.no:$organizationId",
+            orgId = "fintlabs.no",
+            data =
+                Organisasjonselement().apply {
+                    organisasjonsId = Identifikator().apply { identifikatorverdi = organizationId }
+                    navn = name
+                },
+            overordnet = parent,
+            underordnet = children,
+        )
+
+    private fun href(organizationId: String): String =
+        "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/$organizationId"
+}

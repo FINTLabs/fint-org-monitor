@@ -15,6 +15,7 @@ class TemplateService(
         added: List<OrganizationDocument>,
         updated: List<Pair<OrganizationDocument, OrganizationDocument>>,
         parentInfo: List<SimpleOrganizationInfo>,
+        organizationTree: String,
     ): String =
         templateEngine.process(
             "email-template",
@@ -22,6 +23,7 @@ class TemplateService(
                 setVariable("added", added)
                 setVariable("updated", updated.map { UpdatedOrganizationReport.from(it.first, it.second) })
                 setVariable("parentInfo", parentInfo)
+                setVariable("organizationTree", organizationTree)
                 setVariable("emptyChangedFields", linkedSetOf<String>())
                 setVariable("highlightStyle", HIGHLIGHT_STYLE)
             },

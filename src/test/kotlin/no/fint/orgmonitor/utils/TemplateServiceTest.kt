@@ -39,7 +39,7 @@ class TemplateServiceTest {
                 underordnet = listOf("child-a", "child-c"),
             )
 
-        val html = templateService.render(emptyList(), listOf(before to after), emptyList())
+        val html = templateService.render(emptyList(), listOf(before to after), emptyList(), SAMPLE_ORGANIZATION_TREE)
 
         writeReportPreview(html)
 
@@ -52,8 +52,22 @@ class TemplateServiceTest {
         assertFalse(html.contains("background-color: #fff59d\">111111111"))
         assertFalse(html.contains("background-color: #fff59d\">\n        Overordnet: <span>parent-a</span>"))
         assertTrue(html.contains("<td>OLDK</td>"))
+        assertTrue(html.contains("Root (100)"))
         assertFalse(html.contains("#ffb7bd"))
         assertFalse(html.contains("#dbffce"))
+    }
+
+    @Test
+    fun `render includes organization tree`() {
+        val html = templateService.render(emptyList(), emptyList(), emptyList(), SAMPLE_ORGANIZATION_TREE)
+
+        assertTrue(html.contains("<h2>Organisasjonstre:</h2>"))
+        assertTrue(html.contains("Root (100)"))
+        assertTrue(html.contains("`-- Child (200)"))
+    }
+
+    private companion object {
+        const val SAMPLE_ORGANIZATION_TREE = "Root (100)\n`-- Child (200)"
     }
 
     private fun templateEngine(): SpringTemplateEngine {

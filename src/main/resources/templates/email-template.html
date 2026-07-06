@@ -51,5 +51,9 @@
     </tr>
     </table>
 </div>
+<div th:unless="${#strings.isEmpty(organizationTree)}">
+    <h2>Organisasjonstre:</h2>
+    <pre style="font-family: monospace; white-space: pre-wrap;" th:text="${organizationTree}">...</pre>
+</div>
 </body>
 </html>
