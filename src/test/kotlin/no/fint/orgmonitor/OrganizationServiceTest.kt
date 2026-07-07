@@ -241,9 +241,9 @@ class OrganizationServiceTest(
         assertTrue(
             organizationTree.contains(
                 """
-                Hovedkontor (1001)
-                |-- Avdeling A (1002)
-                `-- VGKALN Kalnes videregående skole (762)
+                1001 Hovedkontor
+                |-- 1002 Avdeling A
+                `-- 762 VGKALN Kalnes videregående skole
                 """.trimIndent(),
             ),
             organizationTree,

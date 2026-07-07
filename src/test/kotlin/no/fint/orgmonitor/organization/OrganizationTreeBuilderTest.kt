@@ -37,10 +37,10 @@ class OrganizationTreeBuilderTest {
 
         assertEquals(
             """
-            Root (100)
-            |-- Child A (200)
-            |   `-- Grandchild (400)
-            `-- Child B (300)
+            100 Root
+            |-- 200 Child A
+            |   `-- 400 Grandchild
+            `-- 300 Child B
             """.trimIndent(),
             tree,
         )
@@ -58,8 +58,8 @@ class OrganizationTreeBuilderTest {
 
         assertEquals(
             """
-            First root (100)
-            Second root (200)
+            100 First root
+            200 Second root
             """.trimIndent(),
             tree,
         )
@@ -88,8 +88,8 @@ class OrganizationTreeBuilderTest {
 
         assertEquals(
             """
-            Root (1001)
-            `-- School (762)
+            1001 Root
+            `-- 762 School
             """.trimIndent(),
             tree,
         )

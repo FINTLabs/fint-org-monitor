@@ -52,7 +52,7 @@ class TemplateServiceTest {
         assertFalse(html.contains("background-color: #fff59d\">111111111"))
         assertFalse(html.contains("background-color: #fff59d\">\n        Overordnet: <span>parent-a</span>"))
         assertTrue(html.contains("<td>OLDK</td>"))
-        assertTrue(html.contains("Root (100)"))
+        assertTrue(html.contains("100 Root"))
         assertFalse(html.contains("#ffb7bd"))
         assertFalse(html.contains("#dbffce"))
     }
@@ -62,12 +62,12 @@ class TemplateServiceTest {
         val html = templateService.render(emptyList(), emptyList(), emptyList(), SAMPLE_ORGANIZATION_TREE)
 
         assertTrue(html.contains("<h2>Organisasjonstre:</h2>"))
-        assertTrue(html.contains("Root (100)"))
-        assertTrue(html.contains("`-- Child (200)"))
+        assertTrue(html.contains("100 Root"))
+        assertTrue(html.contains("`-- 200 Child"))
     }
 
     private companion object {
-        const val SAMPLE_ORGANIZATION_TREE = "Root (100)\n`-- Child (200)"
+        const val SAMPLE_ORGANIZATION_TREE = "100 Root\n`-- 200 Child"
     }
 
     private fun templateEngine(): SpringTemplateEngine {
