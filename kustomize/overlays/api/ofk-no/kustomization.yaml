@@ -28,20 +28,22 @@ patches:
           - name: fint.orgmonitor.sender
             value: drift@vigoiks.no
           - name: fint.orgmonitor.recipients
-            value: "integrasjoner.elements@ofk.no, kristinj@ofk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no"
+            value: "integrasjoner.elements@ofk.no, kristinj@ofk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no, daniel.johnsen@novari.no"
+          - name: fint.orgmonitor.cron
+            value: '0 0 8 * * MON-FRI'
     target:
       kind: Application
       name: fint-org-monitor
 
-  - patch: |-
-      apiVersion: fintlabs.no/v1alpha1
-      kind: FintClient
-      metadata:
-        name: fint-org-monitor-client
-        labels:
-          app.kubernetes.io/instance: fint-org-monitor-client_ofk_no
-      spec:
-        orgId: ofk.no
-    target:
-      kind: FintClient
-      name: fint-org-monitor-client
+#  - patch: |-
+#      apiVersion: fintlabs.no/v1alpha1
+#      kind: FintClient
+#      metadata:
+#        name: fint-org-monitor-client
+#        labels:
+#          app.kubernetes.io/instance: fint-org-monitor-client_ofk_no
+#      spec:
+#        orgId: ofk.no
+#    target:
+#      kind: FintClient
+#      name: fint-org-monitor-client

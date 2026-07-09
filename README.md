@@ -12,3 +12,15 @@ The following steps can be used to connect to the database.
 2. Get a shell in the pod through k9s or Lens.
 
 3. Run `mongosh '<connection-string-from-1password>'` in the mongo pod shell.
+
+
+## CRON expression for debugging
+When debugging, you can deploy with just you as a recipient.
+I also recommend having the following CRON expression to make it run every 5 minutes:
+
+`0 */5 8-14 * * ?`
+
+
+## Seeing report example
+When running tests, it will generate a HTML that you can view in the browser. It resides in 
+`build/reports/org-monitor/email-report.html`
