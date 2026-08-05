@@ -6,14 +6,10 @@ package no.fint.orgmonitor.organization
  *
  * Builds the plain-text organization tree included in the change notification email.
  *
- * The source data is a flat set of persisted [OrganizationDocument] instances. Parent-child relationships can be
- * represented from either side:
- *
- * - [OrganizationDocument.overordnet] points from a child to its parent.
- * - [OrganizationDocument.underordnet] points from a parent to its children.
- *
- * Both are used because incremental updates may give us only one side of a relationship. Links that point to
- * organizations missing from [documents] are ignored; those organizations cannot be rendered reliably in the tree.
+ * The source data is a flat set of persisted [OrganizationDocument] instances. Parent-child relationships are built
+ * from [OrganizationDocument.underordnet], because the parent-side child list is the authoritative tree relation.
+ * Links that point to organizations missing from [documents] are ignored; those organizations cannot be rendered
+ * reliably in the tree.
  *
  * Output format keeps the tree drawing first and puts the organization id immediately before the name:
  *
@@ -60,16 +56,8 @@ object OrganizationTreeBuilder {
         val childrenByParentId = linkedMapOf<String, LinkedHashSet<String>>()
         val knownChildIds = linkedSetOf<String>()
 
-        // Build one parent -> children index from both relationship directions. Linked sets keep the output stable
-        // while avoiding duplicate child lines when overordnet and underordnet describe the same relationship.
+        // Build one parent -> children index from the authoritative parent-side child lists.
         documentsByOrganizationId.forEach { (organizationId, document) ->
-            extractOrganizationId(document.overordnet)
-                ?.takeIf { it in documentsByOrganizationId && it != organizationId }
-                ?.let { parentId ->
-                    childrenByParentId.getOrPut(parentId) { linkedSetOf() }.add(organizationId)
-                    knownChildIds.add(organizationId)
-                }
-
             document.underordnet
                 .orEmpty()
                 .mapNotNull(::extractOrganizationId)

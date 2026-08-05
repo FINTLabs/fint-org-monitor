@@ -13,6 +13,7 @@ class TemplateService(
 ) {
     fun render(
         added: List<OrganizationDocument>,
+        removed: List<OrganizationDocument>,
         updated: List<Pair<OrganizationDocument, OrganizationDocument>>,
         parentInfo: List<SimpleOrganizationInfo>,
         organizationTree: String,
@@ -21,6 +22,7 @@ class TemplateService(
             "email-template",
             Context().apply {
                 setVariable("added", added)
+                setVariable("removed", removed)
                 setVariable("updated", updated.map { UpdatedOrganizationReport.from(it.first, it.second) })
                 setVariable("parentInfo", parentInfo)
                 setVariable("organizationTree", organizationTree)

@@ -12,6 +12,7 @@ import no.novari.fint.model.resource.administrasjon.organisasjon.Organisasjonsel
 import org.slf4j.LoggerFactory
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 /**
  * Service responsible for monitoring and updating organization elements.
@@ -34,11 +35,13 @@ class OrganizationService(
 
     private data class UpdateChanges(
         val addedDocuments: MutableList<OrganizationDocument> = mutableListOf(),
+        val removedDocuments: MutableList<OrganizationDocument> = mutableListOf(),
         val documentsToSave: MutableList<OrganizationDocument> = mutableListOf(),
+        val documentsToDelete: MutableList<OrganizationDocument> = mutableListOf(),
         val updatedPairs: MutableList<Pair<OrganizationDocument, OrganizationDocument>> = mutableListOf(),
         val parentIds: MutableSet<String> = linkedSetOf(),
     ) {
-        fun hasChanges(): Boolean = addedDocuments.isNotEmpty() || updatedPairs.isNotEmpty()
+        fun hasChanges(): Boolean = addedDocuments.isNotEmpty() || removedDocuments.isNotEmpty() || updatedPairs.isNotEmpty()
     }
 
     /**
@@ -46,35 +49,30 @@ class OrganizationService(
      *
      * This method performs the following steps:
      * 1. Retrieves all existing organization documents from the repository.
-     * 2. Fetches the latest updates from the configured REST endpoint.
-     * 3. Compares the fetched resources with existing documents to detect additions and modifications.
-     * 4. Persists the changes (new and updated documents) to the database.
-     * 5. If changes were found, compiles a report (including parent info) and sends it via email.
+     * 2. Fetches the current source state from the configured REST endpoint.
+     * 3. Compares the fetched resources with existing documents to detect additions, modifications and removals.
+     * 4. Persists the changes to the database.
+     * 5. If changes were found, compiles a report (including parent info and organization tree) and sends it via email.
      */
     fun update() {
         val documents = organizationRepository.getAllByOrgId(config.orgid)
         logger.info("Repository contains ${documents.size} documents for ${config.orgid}.")
-        // Create a map with the OrganizationMap's id as key, and OrganizationMap itself as the value.
-        val organizationMap =
-            documents
-                .mapNotNull { doc ->
-                    doc.data
-                        ?.organisasjonsId
-                        ?.identifikatorverdi
-                        ?.let { id -> id to doc }
-                }.toMap()
+        val organizationMap = documentsByOrganizationId(documents)
 
-        val (updates, lastUpdated) = fetchUpdates() ?: return
-        logger.info("Found ${updates.size} updates")
+        val (currentState, lastUpdated) = fetchCurrentState() ?: return
+        logger.info("Found ${currentState.size} organization elements in current source state")
         logger.trace(
-            "Updates content: {}",
-            updates.content.joinToString(", ") { "ID=${it.organisasjonsId.identifikatorverdi}, Name=${it.navn}" },
+            "Current state content: {}",
+            currentState.content.joinToString(", ") { "ID=${it.organisasjonsId.identifikatorverdi}, Name=${it.navn}" },
         )
-        val changes = collectChanges(updates.content, organizationMap)
+        val changes = collectChanges(currentState.content, documents, organizationMap)
 
         logger.info("Saving {} updates", changes.documentsToSave.size)
         organizationRepository.saveAll(changes.documentsToSave)
+        logger.info("Deleting {} stale documents", changes.documentsToDelete.size)
+        organizationRepository.deleteAll(changes.documentsToDelete)
         logger.info("Added: {} items", changes.addedDocuments.size)
+        logger.info("Removed: {} items", changes.removedDocuments.size)
         logger.info("Updated: {} items", changes.updatedPairs.size)
 
         sendNotification(changes)
@@ -84,28 +82,42 @@ class OrganizationService(
         syncStateRepository.save(SyncState(config.orgid, lastUpdated))
     }
 
-    private fun fetchUpdates(): Pair<OrganisasjonselementResources, Long>? {
-        val (updates, lastUpdated) =
-            restUtil.getUpdates(
+    private fun fetchCurrentState(): Pair<OrganisasjonselementResources, Long>? {
+        val (currentState, lastUpdated) =
+            restUtil.getCurrentState(
                 object : ParameterizedTypeReference<OrganisasjonselementResources?>() {},
             )
 
-        if (updates == null) {
-            logger.error("Failed to fetch updates from endpoint")
+        if (currentState == null) {
+            logger.error("Failed to fetch current organization state from endpoint")
             return null
         }
 
-        return updates to lastUpdated
+        if (currentState.offset != 0 || currentState.content.size != currentState.totalItems) {
+            logger.error(
+                "Current organization state response is incomplete. offset={}, contentSize={}, totalItems={}. " +
+                    "Skipping reconciliation to avoid deleting documents from a partial snapshot.",
+                currentState.offset,
+                currentState.content.size,
+                currentState.totalItems,
+            )
+            return null
+        }
+
+        return currentState to lastUpdated
     }
 
     private fun collectChanges(
         resources: List<OrganisasjonselementResource>,
+        existingDocuments: List<OrganizationDocument>,
         organizationMap: Map<String, OrganizationDocument>,
     ): UpdateChanges {
         val changes = UpdateChanges()
+        val sourceOrganizationIds = linkedSetOf<String>()
 
         resources.forEach { resource ->
             val resourceId = resource.organisasjonsId.identifikatorverdi
+            sourceOrganizationIds.add(resourceId)
             val newDocument = createDocument(resource)
             val existingDocument = organizationMap[resourceId]
 
@@ -116,6 +128,10 @@ class OrganizationService(
             }
             // If none of the above, then we do nothing as there is no change.
         }
+
+        existingDocuments
+            .filter { document -> document.organizationId() !in sourceOrganizationIds }
+            .forEach { staleDocument -> storeRemovedDocument(staleDocument, changes, organizationMap) }
 
         return changes
     }
@@ -140,6 +156,19 @@ class OrganizationService(
         modifiedDocument.overordnet?.let { registerParentId(it, organizationMap, changes) }
     }
 
+    // A removed document is one that exists locally but is absent from the complete current source snapshot.
+    // Queue it for deletion and include it in the notification so stale MongoDB state cannot keep appearing in the tree.
+    private fun storeRemovedDocument(
+        removedDocument: OrganizationDocument,
+        changes: UpdateChanges,
+        organizationMap: Map<String, OrganizationDocument>,
+    ) {
+        changes.documentsToDelete.add(removedDocument)
+        changes.removedDocuments.add(removedDocument)
+
+        removedDocument.overordnet?.let { registerParentId(it, organizationMap, changes) }
+    }
+
     private fun storeNewDocument(
         newDocument: OrganizationDocument,
         changes: UpdateChanges,
@@ -156,7 +185,10 @@ class OrganizationService(
         organizationMap: Map<String, OrganizationDocument>,
         changes: UpdateChanges,
     ) {
-        organizationMap[parentHref]?.id?.let(changes.parentIds::add)
+        extractOrganizationId(parentHref)
+            ?.let(organizationMap::get)
+            ?.id
+            ?.let(changes.parentIds::add)
     }
 
     private fun sendNotification(changes: UpdateChanges) {
@@ -167,7 +199,15 @@ class OrganizationService(
         val parentInfo = createParentInfo(changes.parentIds.toList())
         // Reload after saveAll so the tree reflects the persisted post-update organization state.
         val organizationTree = OrganizationTreeBuilder.build(organizationRepository.getAllByOrgId(config.orgid))
-        mailingService.send(templateService.render(changes.addedDocuments, changes.updatedPairs, parentInfo, organizationTree))
+        mailingService.send(
+            templateService.render(
+                changes.addedDocuments,
+                changes.removedDocuments,
+                changes.updatedPairs,
+                parentInfo,
+                organizationTree,
+            ),
+        )
     }
 
     private fun createDocument(resource: OrganisasjonselementResource) =
@@ -190,4 +230,38 @@ class OrganizationService(
                 }
             }
         }
+
+    private fun documentsByOrganizationId(documents: Collection<OrganizationDocument>): Map<String, OrganizationDocument> =
+        documents
+            .mapNotNull { document -> document.organizationId()?.let { organizationId -> organizationId to document } }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (organizationId, documentsWithOrganizationId) ->
+                documentsWithOrganizationId.maxWith(
+                    compareBy<OrganizationDocument>(
+                        { it.hasScopedId(organizationId) },
+                        { it.lastModifiedDate ?: LocalDateTime.MIN },
+                        { it.id },
+                    ),
+                )
+            }
+
+    private fun extractOrganizationId(value: String?): String? {
+        val trimmed = value?.trim()?.takeIf { it.isNotEmpty() } ?: return null
+        return organizationIdInHref.find(trimmed)?.groupValues?.get(1)
+            ?: trimmed.substringAfterLast("/").takeIf { it.isNotBlank() }
+    }
+
+    private fun OrganizationDocument.organizationId(): String? =
+        data
+            ?.organisasjonsId
+            ?.identifikatorverdi
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: id.substringAfter(":").takeIf { it.isNotBlank() }
+
+    private fun OrganizationDocument.hasScopedId(organizationId: String): Boolean = id == "$orgId:$organizationId"
+
+    private companion object {
+        val organizationIdInHref = Regex("""/organisasjonsid/([^/?#]+)""", RegexOption.IGNORE_CASE)
+    }
 }

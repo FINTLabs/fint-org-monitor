@@ -13,6 +13,14 @@
         </li>
     </ol>
 </div>
+<div th:unless="${#lists.isEmpty(removed)}">
+    <h2>Følgende organisasjonselementer er fjernet:</h2>
+    <ol>
+        <li th:each="item: ${removed}">
+            <div th:insert="~{element::org(${item}, ${emptyChangedFields})}">...</div>
+        </li>
+    </ol>
+</div>
 <div th:unless="${#lists.isEmpty(updated)}">
     <h2>Følgende organisasjonselementer er endret:</h2>
     <ol>

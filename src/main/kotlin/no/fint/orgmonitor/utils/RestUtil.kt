@@ -48,21 +48,55 @@ class RestUtil(
                     .build()
                     .toUriString(),
             )
-        // get last-updated timestamp from API
-        val lastUpdated =
-            requireNotNull(
-                get(
-                    // ParameterizedTypeReference is used to get the generic data without an explicit type.
-                    object : ParameterizedTypeReference<MutableMap<String, String>>() {},
-                    UriComponentsBuilder
-                        .fromUriString(config.endpoint)
-                        .pathSegment("last-updated")
-                        .build()
-                        .toUriString(),
-                )["lastUpdated"],
-            ) { "No lastUpdated value from ${config.endpoint}" }.toLong()
+        val lastUpdated = getLastUpdated()
         return result to lastUpdated
     }
+
+    /**
+     * Fetches the current source-of-truth state from the configured endpoint.
+     *
+     * A full snapshot is needed to reconcile deletions. An element absent from an incremental
+     * sinceTimeStamp response only means it did not change in that window; an element absent from
+     * the full current collection is stale locally and can be removed.
+     */
+    fun <T> getCurrentState(type: ParameterizedTypeReference<T>): Pair<T, Long> {
+        val previousLastUpdated =
+            syncStateRepository
+                .findById(config.orgid)
+                .map { it.lastUpdated }
+                .orElse(0L)
+        val lastUpdated = getLastUpdated()
+        logger.info(
+            "Fetching current state for {}. Previous lastUpdated: {}, source lastUpdated: {}",
+            config.orgid,
+            previousLastUpdated,
+            lastUpdated,
+        )
+
+        val result =
+            get(
+                type,
+                UriComponentsBuilder
+                    .fromUriString(config.endpoint)
+                    .build()
+                    .toUriString(),
+            )
+
+        return result to lastUpdated
+    }
+
+    private fun getLastUpdated(): Long =
+        requireNotNull(
+            get(
+                // ParameterizedTypeReference is used to get the generic data without an explicit type.
+                object : ParameterizedTypeReference<MutableMap<String, String>>() {},
+                UriComponentsBuilder
+                    .fromUriString(config.endpoint)
+                    .pathSegment("last-updated")
+                    .build()
+                    .toUriString(),
+            )["lastUpdated"],
+        ) { "No lastUpdated value from ${config.endpoint}" }.toLong()
 
     /**
      * Performs a GET request to the specified URI and returns the response body.

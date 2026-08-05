@@ -1,7 +1,6 @@
 package no.fint.orgmonitor
 
 import com.github.tomakehurst.wiremock.client.WireMock.get
-import com.github.tomakehurst.wiremock.client.WireMock.matching
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import no.fint.orgmonitor.mailing.MailingService
@@ -29,6 +28,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.Instant
 import java.util.Date
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @SpringBootTest
@@ -89,19 +89,55 @@ class OrganizationServiceTest(
 
     @Test
     fun `should not do anything when there is no update`() {
-        // Override WireMock mappings to return an empty list (no updates)
+        // Return the same current source state as the already persisted document.
         wireMockServer.stubFor(
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
-                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
                         {
                           "_embedded": {
-                            "_entries": []
+                            "_entries": [
+                              {
+                                "organisasjonsId": {
+                                  "identifikatorverdi": "762"
+                                },
+                                "organisasjonsKode": {
+                                  "identifikatorverdi": "V40.44.17"
+                                },
+                                "organisasjonsnummer": {
+                                  "identifikatorverdi": "974544520"
+                                },
+                                "navn": "VGKALN Kalnes videregående skole",
+                                "kortnavn": "VGKALN",
+                                "gyldighetsperiode": {
+                                  "start": "2019-04-01T00:00:00Z"
+                                },
+                                "_links": {
+                                  "overordnet": [
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/156"
+                                    }
+                                  ],
+                                  "underordnet": [
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/763"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/766"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/770"
+                                    },
+                                    {
+                                      "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/775"
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
                           },
-                          "total_items": 0,
-                          "content": []
+                          "total_items": 1
                         }
                         """.trimIndent(),
                     ),
@@ -116,10 +152,32 @@ class OrganizationServiceTest(
     }
 
     @Test
+    fun `should leave local data untouched when current source response is incomplete`() {
+        // The repository already contains org 762 from setUp().
+        // The source response says there should be 2 items, but only returns 1.
+        // That means this is a partial snapshot, so it must not be used for deletion reconciliation.
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .willReturn(
+                    okJson(partialCurrentStateResponse()),
+                ),
+        )
+
+        organizationService.update()
+
+        // If partial snapshots were treated as authoritative, org 762 would be deleted
+        // because it is missing from the response.
+        assertTrue(organizationRepository.findById("762").isPresent)
+
+        // The returned org 1001 should also not be inserted; the whole reconciliation run is skipped.
+        assertFalse(organizationRepository.findById("fintlabs.no:1001").isPresent)
+        verify(mailingService, never()).send(anyString())
+    }
+
+    @Test
     fun `should create report when there is an update`() {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
-                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
@@ -150,6 +208,14 @@ class OrganizationServiceTest(
                                   "overordnet": [
                                     {
                                       "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1000"
+                                    }
+                                  ],
+                                  "underordnet": [
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1002"
+                                    },
+                                    {
+                                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/762"
                                     }
                                   ]
                                 }
@@ -231,13 +297,13 @@ class OrganizationServiceTest(
                 ),
         )
         var organizationTree = ""
-        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyList(), anyString()))
             .thenAnswer { invocation ->
-                organizationTree = invocation.getArgument(3)
+                organizationTree = invocation.getArgument(4)
                 "<html>Default Mock HTML</html>"
             }
         organizationService.update()
-        verify(templateService).render(anyList(), anyList(), anyList(), anyString())
+        verify(templateService).render(anyList(), anyList(), anyList(), anyList(), anyString())
         assertTrue(
             organizationTree.contains(
                 """
@@ -254,7 +320,6 @@ class OrganizationServiceTest(
     fun `should persist new documents with their id and not re-report them on a second run`() {
         val stub =
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
-                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
@@ -291,7 +356,7 @@ class OrganizationServiceTest(
                     ),
                 )
         wireMockServer.stubFor(stub)
-        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyList(), anyString()))
             .thenReturn("<html>Default Mock HTML</html>")
 
         // First run: both elements are new and must be added.
@@ -335,7 +400,6 @@ class OrganizationServiceTest(
         // fintlabs.no (the test profile's orgid) receives an update for the same identifikatorverdi.
         wireMockServer.stubFor(
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
-                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
@@ -361,7 +425,7 @@ class OrganizationServiceTest(
                     ),
                 ),
         )
-        `when`(templateService.render(anyList(), anyList(), anyList(), anyString()))
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyList(), anyString()))
             .thenReturn("<html>Default Mock HTML</html>")
 
         organizationService.update()
@@ -382,7 +446,6 @@ class OrganizationServiceTest(
     fun `should not do anything when the order of underordnet changes`() {
         wireMockServer.stubFor(
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
-                .withQueryParam("sinceTimeStamp", matching("\\d+"))
                 .willReturn(
                     okJson(
                         """
@@ -438,4 +501,150 @@ class OrganizationServiceTest(
         organizationService.update()
         verify(mailingService, never()).send(anyString())
     }
+
+    @Test
+    fun `should delete stale documents missing from current source and exclude them from organization tree`() {
+        organizationRepository.deleteAll()
+        organizationRepository.saveAll(
+            listOf(
+                document(
+                    organizationId = "120",
+                    name = "VGBLEI Bleiker videregående skole",
+                    kortnavn = "VGBLEI",
+                    children = listOf(href("570")),
+                ),
+                document(
+                    organizationId = "570",
+                    name = "VGBLEI pedagogisk ledelse",
+                    kortnavn = "VGBLEI",
+                    parent = href("120"),
+                ),
+                document(
+                    organizationId = "663",
+                    name = "VGVEST grunnskole",
+                    kortnavn = "VGVEST grunnsk",
+                    children = listOf(href("664")),
+                ),
+                document(
+                    organizationId = "664",
+                    name = "VGVEST drift/renhold",
+                    kortnavn = "VGVEST",
+                    parent = href("663"),
+                ),
+            ),
+        )
+
+        wireMockServer.stubFor(
+            get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
+                .willReturn(
+                    okJson(
+                        """
+                        {
+                          "_embedded": {
+                            "_entries": [
+                              {
+                                "navn": "VGBLEI Bleiker videregående skole",
+                                "kortnavn": "VGBLEI",
+                                "organisasjonsId": { "identifikatorverdi": "120" },
+                                "organisasjonsKode": { "identifikatorverdi": "F40.42.52" },
+                                "organisasjonsnummer": { "identifikatorverdi": "974587831" },
+                                "gyldighetsperiode": { "start": "2023-01-01T00:00:00Z" },
+                                "_links": {
+                                  "overordnet": [ { "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/36" } ],
+                                  "underordnet": []
+                                }
+                              },
+                              {
+                                "navn": "VGVEST grunnskole",
+                                "kortnavn": "VGVEST grunnsk",
+                                "organisasjonsId": { "identifikatorverdi": "663" },
+                                "organisasjonsKode": { "identifikatorverdi": "F40.43.74.65" },
+                                "organisasjonsnummer": { "identifikatorverdi": "974587815" },
+                                "gyldighetsperiode": { "start": "2025-03-24T00:00:00Z" },
+                                "_links": {
+                                  "overordnet": [ { "href": "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/622" } ],
+                                  "underordnet": []
+                                }
+                              }
+                            ]
+                          },
+                          "total_items": 2
+                        }
+                        """.trimIndent(),
+                    ),
+                ),
+        )
+
+        var removedDocuments: List<OrganizationDocument> = emptyList()
+        var organizationTree = ""
+        `when`(templateService.render(anyList(), anyList(), anyList(), anyList(), anyString()))
+            .thenAnswer { invocation ->
+                removedDocuments = invocation.getArgument(1)
+                organizationTree = invocation.getArgument(4)
+                "<html>Default Mock HTML</html>"
+            }
+
+        organizationService.update()
+
+        assertFalse(organizationRepository.findById("fintlabs.no:570").isPresent)
+        assertFalse(organizationRepository.findById("fintlabs.no:664").isPresent)
+        assertTrue(removedDocuments.map { it.data?.organisasjonsId?.identifikatorverdi }.containsAll(listOf("570", "664")))
+        assertFalse(organizationTree.contains("570 VGBLEI pedagogisk ledelse"), organizationTree)
+        assertFalse(organizationTree.contains("664 VGVEST drift/renhold"), organizationTree)
+    }
+
+    private fun document(
+        organizationId: String,
+        name: String,
+        kortnavn: String,
+        parent: String? = null,
+        children: List<String> = emptyList(),
+    ): OrganizationDocument =
+        OrganizationDocument(
+            id = "fintlabs.no:$organizationId",
+            orgId = "fintlabs.no",
+            data =
+                Organisasjonselement().apply {
+                    organisasjonsId = Identifikator().apply { identifikatorverdi = organizationId }
+                    organisasjonsKode = Identifikator().apply { identifikatorverdi = "ORG_$organizationId" }
+                    organisasjonsnummer = Identifikator().apply { identifikatorverdi = "999999999" }
+                    navn = name
+                    this.kortnavn = kortnavn
+                    gyldighetsperiode =
+                        Periode().apply {
+                            start = Date.from(Instant.parse("2019-04-01T00:00:00Z"))
+                        }
+                },
+            overordnet = parent,
+            underordnet = children,
+        )
+
+    private fun href(organizationId: String): String =
+        "https://test.felleskomponent.no/administrasjon/organisasjon/organisasjonselement/organisasjonsId/$organizationId"
+
+    private fun partialCurrentStateResponse(): String =
+        """
+        {
+          "_embedded": {
+            "_entries": [
+              {
+                "navn": "Hovedkontor",
+                "kortnavn": "HK",
+                "organisasjonsId": { "identifikatorverdi": "1001" },
+                "organisasjonsKode": { "identifikatorverdi": "ORG_1" },
+                "organisasjonsnummer": { "identifikatorverdi": "999999999" },
+                "gyldighetsperiode": { "start": "2019-04-01T00:00:00Z" },
+                "_links": {
+                  "self": [
+                    {
+                      "href": "https://test.fintlabs.no/administrasjon/organisasjon/organisasjonselement/organisasjonsid/1001"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "total_items": 2
+        }
+        """.trimIndent()
 }

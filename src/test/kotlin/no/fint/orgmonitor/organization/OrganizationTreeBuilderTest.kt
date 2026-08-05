@@ -76,7 +76,11 @@ class OrganizationTreeBuilderTest {
                         name = "School",
                         parent = href("156"),
                     ),
-                    document(organizationId = "1001", name = "Root"),
+                    document(
+                        organizationId = "1001",
+                        name = "Root",
+                        children = listOf(href("762")),
+                    ),
                     document(
                         id = "fintlabs.no:762",
                         organizationId = "762",
@@ -90,6 +94,29 @@ class OrganizationTreeBuilderTest {
             """
             1001 Root
             `-- 762 School
+            """.trimIndent(),
+            tree,
+        )
+    }
+
+    @Test
+    fun `build does not attach child from overordnet when parent does not list child`() {
+        val tree =
+            OrganizationTreeBuilder.build(
+                listOf(
+                    document(organizationId = "100", name = "Parent"),
+                    document(
+                        organizationId = "200",
+                        name = "Stale child",
+                        parent = href("100"),
+                    ),
+                ),
+            )
+
+        assertEquals(
+            """
+            100 Parent
+            200 Stale child
             """.trimIndent(),
             tree,
         )

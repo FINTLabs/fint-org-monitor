@@ -39,7 +39,7 @@ class TemplateServiceTest {
                 underordnet = listOf("child-a", "child-c"),
             )
 
-        val html = templateService.render(emptyList(), listOf(before to after), emptyList(), SAMPLE_ORGANIZATION_TREE)
+        val html = templateService.render(emptyList(), emptyList(), listOf(before to after), emptyList(), SAMPLE_ORGANIZATION_TREE)
 
         writeReportPreview(html)
 
@@ -59,11 +59,21 @@ class TemplateServiceTest {
 
     @Test
     fun `render includes organization tree`() {
-        val html = templateService.render(emptyList(), emptyList(), emptyList(), SAMPLE_ORGANIZATION_TREE)
+        val html = templateService.render(emptyList(), emptyList(), emptyList(), emptyList(), SAMPLE_ORGANIZATION_TREE)
 
         assertTrue(html.contains("<h2>Organisasjonstre:</h2>"))
         assertTrue(html.contains("100 Root"))
         assertTrue(html.contains("`-- 200 Child"))
+    }
+
+    @Test
+    fun `render includes removed organizations`() {
+        val removed = document(kortnavn = "OLD", navn = "Removed org")
+
+        val html = templateService.render(emptyList(), listOf(removed), emptyList(), emptyList(), "")
+
+        assertTrue(html.contains("Følgende organisasjonselementer er fjernet:"))
+        assertTrue(html.contains("Removed org"))
     }
 
     private companion object {
