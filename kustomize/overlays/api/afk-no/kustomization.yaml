@@ -30,7 +30,7 @@ patches:
           - name: fint.orgmonitor.recipients
             value: "integrasjoner.elements@afk.no, maritj@afk.no, birgerbra@frid-iks.no, digitale.skjema@frid-iks.no, daniel.johnsen@novari.no"
           - name: fint.orgmonitor.cron
-            value: '0 0/30 7-14 * * MON-FRI'
+            value: '0 0 8 * * MON-FRI'
     target:
       kind: Application
       name: fint-org-monitor
