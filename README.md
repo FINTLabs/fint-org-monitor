@@ -13,6 +13,8 @@ The following steps can be used to connect to the database.
 
 3. Run `mongosh '<connection-string-from-1password>'` in the mongo pod shell.
 
+4. Remove the mongo image after you are done! `kubectl delete -f mongo.yaml`
+
 
 ## CRON expression for debugging
 When debugging, you can deploy with just you as a recipient.
