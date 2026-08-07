@@ -317,7 +317,7 @@ class OrganizationServiceTest(
     }
 
     @Test
-    fun `should persist new documents with their id and not re-report them on a second run`() {
+    fun `should report and persist new documents with their id and not re-report them on a second run`() {
         val stub =
             get(urlPathEqualTo("/administrasjon/organisasjon/organisasjonselement"))
                 .willReturn(
@@ -356,8 +356,12 @@ class OrganizationServiceTest(
                     ),
                 )
         wireMockServer.stubFor(stub)
+        var addedDocuments: List<OrganizationDocument> = emptyList()
         `when`(templateService.render(anyList(), anyList(), anyList(), anyList(), anyString()))
-            .thenReturn("<html>Default Mock HTML</html>")
+            .thenAnswer { invocation ->
+                addedDocuments = invocation.getArgument(0)
+                "<html>Default Mock HTML</html>"
+            }
 
         // First run: both elements are new and must be added.
         organizationService.update()
@@ -365,10 +369,17 @@ class OrganizationServiceTest(
         // Both new docs persisted under their own id (regression: previously saved with empty id and collided).
         assert(organizationRepository.findById("fintlabs.no:1001").isPresent) { "Document 1001 was not persisted" }
         assert(organizationRepository.findById("fintlabs.no:1002").isPresent) { "Document 1002 was not persisted" }
+        assertTrue(
+            addedDocuments.map { it.data?.organisasjonsId?.identifikatorverdi }.containsAll(listOf("1001", "1002")),
+        )
+        assertTrue(
+            addedDocuments.map { it.data?.navn }.containsAll(listOf("Hovedkontor", "Avdeling A")),
+        )
 
         // Second run with identical data: nothing changed, so no new notification.
         organizationService.update()
 
+        verify(templateService, times(1)).render(anyList(), anyList(), anyList(), anyList(), anyString())
         verify(mailingService, times(1)).send(anyString())
     }
 

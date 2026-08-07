@@ -20,9 +20,22 @@ class TemplateServiceTest {
     private val templateService = TemplateService(templateEngine())
 
     @Test
-    fun `render highlights changed after values in yellow without red or green column backgrounds`() {
+    fun `render writes preview with added removed and changed organizations`() {
+        val added =
+            document(
+                organizationId = "1001",
+                kortnavn = "NEW",
+                navn = "New org",
+            )
+        val removed =
+            document(
+                organizationId = "1002",
+                kortnavn = "DEL",
+                navn = "Deleted org",
+            )
         val before =
             document(
+                organizationId = "762",
                 kortnavn = "OLDK",
                 navn = "Old name",
                 kode = "OLD_CODE",
@@ -32,6 +45,7 @@ class TemplateServiceTest {
             )
         val after =
             document(
+                organizationId = "762",
                 kortnavn = "OLDK",
                 navn = "New name",
                 kode = "NEW_CODE",
@@ -40,10 +54,15 @@ class TemplateServiceTest {
                 underordnet = listOf("child-a", "child-c"),
             )
 
-        val html = templateService.render(emptyList(), emptyList(), listOf(before to after), emptyList(), SAMPLE_ORGANIZATION_TREE)
+        val html = templateService.render(listOf(added), listOf(removed), listOf(before to after), emptyList(), SAMPLE_ORGANIZATION_TREE)
 
         writeReportPreview(html)
 
+        assertTrue(html.contains("Følgende organisasjonselementer er nye:"))
+        assertTrue(html.contains("New org"))
+        assertTrue(html.contains("Følgende organisasjonselementer er fjernet:"))
+        assertTrue(html.contains("Deleted org"))
+        assertTrue(html.contains("Følgende organisasjonselementer er endret:"))
         assertTrue(html.contains("background-color: #fff59d\">New name"))
         assertTrue(html.contains("background-color: #fff59d\">NEW_CODE"))
         assertTrue(html.contains("background-color: #fff59d\">222222222"))
@@ -114,6 +133,7 @@ class TemplateServiceTest {
     }
 
     private fun document(
+        organizationId: String = "762",
         kortnavn: String,
         navn: String,
         kode: String = "V40.44.17",
@@ -122,14 +142,14 @@ class TemplateServiceTest {
         underordnet: List<String> = listOf("child-a", "child-b"),
     ): OrganizationDocument =
         OrganizationDocument(
-            id = "fintlabs.no:762",
+            id = "fintlabs.no:$organizationId",
             orgId = "fintlabs.no",
             data =
                 Organisasjonselement().apply {
                     this.kortnavn = kortnavn
                     this.navn = navn
                     organisasjonsKode = Identifikator().apply { identifikatorverdi = kode }
-                    organisasjonsId = Identifikator().apply { identifikatorverdi = "762" }
+                    organisasjonsId = Identifikator().apply { identifikatorverdi = organizationId }
                     organisasjonsnummer = Identifikator().apply { identifikatorverdi = organizationNumber }
                     gyldighetsperiode =
                         Periode().apply {
