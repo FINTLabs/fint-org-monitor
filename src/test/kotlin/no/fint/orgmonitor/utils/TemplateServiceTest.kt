@@ -1,6 +1,7 @@
 package no.fint.orgmonitor.utils
 
 import no.fint.orgmonitor.organization.OrganizationDocument
+import no.fint.orgmonitor.organization.SimpleOrganizationInfo
 import no.novari.fint.model.administrasjon.organisasjon.Organisasjonselement
 import no.novari.fint.model.felles.kompleksedatatyper.Identifikator
 import no.novari.fint.model.felles.kompleksedatatyper.Periode
@@ -74,6 +75,17 @@ class TemplateServiceTest {
 
         assertTrue(html.contains("Følgende organisasjonselementer er fjernet:"))
         assertTrue(html.contains("Removed org"))
+    }
+
+    @Test
+    fun `render includes parent organization info`() {
+        val parentInfo = listOf(SimpleOrganizationInfo("fintlabs.no:123", "Parent org"))
+
+        val html = templateService.render(emptyList(), emptyList(), emptyList(), parentInfo, "")
+
+        assertTrue(html.contains("Overordnede organisasjonsenheter:"))
+        assertTrue(html.contains("<td>fintlabs.no:123</td>"))
+        assertTrue(html.contains("<td>Parent org</td>"))
     }
 
     private companion object {
