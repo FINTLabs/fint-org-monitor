@@ -23,6 +23,8 @@ patches:
       spec:
         orgId: fintlabs.no
         env:
+          - name: JAVA_TOOL_OPTIONS
+            value: "-XX:+ExitOnOutOfMemoryError -XX:-UseBASE64Intrinsics"
           - name: fint.environment
             value: beta
           - name: fint.orgmonitor.sender

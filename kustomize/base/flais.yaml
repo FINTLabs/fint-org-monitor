@@ -21,6 +21,8 @@ spec:
     port: '8080'
     path: /actuator/prometheus
   env:
+    - name: JAVA_TOOL_OPTIONS
+      value: "-XX:+ExitOnOutOfMemoryError -XX:-UseBASE64Intrinsics"
     - name: fint.environment
       value: beta
     - name: fint.orgmonitor.sender
